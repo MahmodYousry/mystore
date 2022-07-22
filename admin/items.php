@@ -109,7 +109,7 @@
 
 	  		<h1 class="text-center">Add New Item</h1>
 			<div class="container">
-				<form class="form-horizontal" action="?do=Insert" method="POST">
+				<form class="form-horizontal" action="?do=Insert" method="POST" enctype="multipart/form-data">
 					<!-- Start Name Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Name</label>
@@ -224,6 +224,15 @@
 						</div>
 					</div>
 					<!-- END Tags Field -->
+					<!-- Start upload pic Field -->
+					<div class="form-group form-group-lg">
+						<label class="col-sm-2 control-label" for="filepic">img</label>
+						<div class="col-sm-10 col-md-8">
+							<input type="file" class="form-control" id="filepic" name="productpic">
+						</div>
+						
+					</div>
+					<!-- END upload pic Field -->
 					<!-- Start submit Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">
@@ -249,6 +258,19 @@
 
       			// Get Variables From The Form
 
+				// Upload Variables
+				$avatarName =  $_FILES['productpic']['name'];
+				$avatarSize =  $_FILES['productpic']['size'];
+				$avatarTmp 	=  $_FILES['productpic']['tmp_name'];
+			   	$avatarType =  $_FILES['productpic']['type'] . '<br>';
+
+				// List Of Allowed File Types To Upload
+				$avatarAllowedExtension = array("jpeg", "jpg", "png", "gif");
+
+				// explose shortcut for php 8 need
+				$explodeThispl = explode('.', $avatarName);
+				$avatarExtension = strtolower(end($explodeThispl));
+
       			$name 		= $_POST['name'];
       			$desc 		= $_POST['description'];
       			$price 		= $_POST['price'];
@@ -259,7 +281,6 @@
       			$tags 		= $_POST['tags'];
 
       			// Validate The Form
-
       			$formErrors = array();
 
       			if (empty($name)) { $formErrors[] = 'Name Can\'t be <strong>Empty</strong>'; }
@@ -270,6 +291,9 @@
 				if ($member == 0) { $formErrors[] = 'You Must Choose The <strong>Member</strong>'; }
 				if ($cat == 0) { $formErrors[] = 'You Must Choose The <strong>Category</strong>'; }
 
+				if (empty($avatarName)) { $formErrors[] = 'Avatar Is <strong>Required</strong>'; }
+				if ($avatarSize > 6194304) { $formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>'; }
+
       			// Loop Into Errors Array And Echo It
       			foreach($formErrors as $error) {
       				echo '<div class="alert alert-danger">' . $error . '</div>';
@@ -278,20 +302,23 @@
       			// Check If There's No Error Proceed The Update Operation
       			if (empty($formErrors)) {
 
+					$avatar = rand(0, 10000) . '_' . $avatarName;
+      				move_uploaded_file($avatarTmp, "../products/" . $avatar);
+
 					// Insert Userinfo To Database
 					$stmt = $con->prepare("INSERT INTO 
-							items(Name, Description, Price, Country_Made, Status, Add_Date, Cat_ID, Member_ID, tags)
-						VALUES(:zname, :zdesc, :zprice, :zcountry, :zstatus, now(), :zcat, :zmember, :ztags)");
+							items(Name, Description, Price, Status, Add_Date, Cat_ID, Member_ID, tags, Image)
+						VALUES(:zname, :zdesc, :zprice, :zstatus, now(), :zcat, :zmember, :ztags, :zImage)");
 
 					$stmt->execute(array(
 						'zname'		=> $name,
 						'zdesc'		=> $desc,
 						'zprice'	=> $price,
-						'zcountry'	=> $country,
 						'zstatus'	=> $status,
 						'zcat'		=> $cat,
 						'zmember'	=> $member,
-						'ztags'		=> $tags
+						'ztags'		=> $tags,
+						'zImage'  	=> $avatar
 					));
 
 					// Echo Success Message
@@ -407,19 +434,9 @@
 			$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
 
 			// Select All Data Depend on This ID
-
 			$stmt = $con->prepare("SELECT * FROM items WHERE Item_ID = ?");
-			
-			// Excute Query
-
 			$stmt->execute(array($itemid));
-
-			// Fetch The Data
-
 			$item = $stmt->fetch();
-
-			// The Row Count
-
 			$count = $stmt->rowCount();
 
 			// If There\s Such ID Show The Form
@@ -473,20 +490,6 @@
 							</div>
 						</div>
 						<!-- END Price Field -->
-						<!-- Start Country Field -->
-						<div class="form-group form-group-lg">
-							<label class="col-sm-2 control-label">Country</label>
-							<div class="col-sm-10 col-md-6">
-								<input 
-									type="text" 
-									name="country" 
-									class="form-control" 
-									required="required" 
-									placeholder="Country of Made"
-									value="<?php echo $item['Country_Made'] ?>" />
-							</div>
-						</div>
-						<!-- END Country Field -->
 						<!-- Start Status Field -->
 						<div class="form-group form-group-lg">
 							<label class="col-sm-2 control-label">Status</label>
@@ -554,7 +557,8 @@
 						<!-- Start submit Field -->
 						<div class="form-group form-group-lg">
 							<div class="col-sm-offset-2 col-sm-10">
-								<input type="submit" value="Save Item" class="btn btn-primary btn-sm" />
+								<input type="submit" value="Save Item" class="btn btn-primary btn-sm">
+								<a class="btn btn-primary btn-sm" href="items.php">back <i class="fa fa-chevron-right fa-xs"></i></a>
 							</div>
 						</div>
 						<!-- END submit Field -->
@@ -564,31 +568,21 @@
 
 					// Select All Users Except Admin
 
-					      	$stmt = $con->prepare("SELECT 
-					      								comments.*, users.Username AS Member
-					      						   FROM 
-					      						   		comments
-					      						   	INNER JOIN
-					      						   		users
-					      						   	ON
-					      						   		users.UserID = comments.user_id
-					      						   	WHERE item_id = ?");
+					$stmt = $con->prepare("SELECT 
+												comments.*, users.Username AS Member
+											FROM 
+												comments
+											INNER JOIN
+												users
+											ON
+												users.UserID = comments.user_id
+											WHERE item_id = ?");
+					$stmt->execute(array($itemid));
+					$rows = $stmt->fetchAll();
 
-					      	// Excute The Statement
+					if (! empty($rows)) {
 
-					      	$stmt->execute(array($itemid));
-
-					      	//	Assign To Variable
-
-					      	$rows = $stmt->fetchAll();
-
-					      	if (! empty($rows)) {
-
-
-
-					      	
-
-							?>
+					?>
 
 						<h1 class="text-center">Manage [ <?php echo $item['Name'] ?> ] Comments</h1>
 						<div class="table-responsive">
@@ -629,11 +623,8 @@
       		} else {
 
       			echo '<div class="container">';
-
-      			$theMsg = '<div class="alert alert-danger">There\'s no such id</div>';
-
-      			redirectHome($theMsg);
-
+      				$theMsg = '<div class="alert alert-danger">There\'s no such id</div>';
+      				redirectHome($theMsg);
       			echo '</div>';
 
       		}
@@ -652,7 +643,6 @@
       			$name 		= $_POST['name'];
       			$desc 		= $_POST['description'];
       			$price 		= $_POST['price'];
-      			$country 	= $_POST['country'];
       			$status 	= $_POST['status'];
       			$cat 		= $_POST['category'];
       			$member 	= $_POST['member'];
@@ -662,53 +652,26 @@
 
       			$formErrors = array();
 
-      			if (empty($name)) {
-      				$formErrors[] = 'Name Can\'t be <strong>Empty</strong>';
-      			}
-
-				if (empty($desc)) {
-      				$formErrors[] = 'Description Can\'t be <strong>Empty</strong>';
-      			}
-
-      			if (empty($price)) {
-      				$formErrors[] = 'Price Can\'t be <strong>Empty</strong>';
-      			}
-
-      			if (empty($country)) {
-					$formErrors[] = 'Country Can\'t be <strong>Empty</strong>';
-      			}
-
-				if ($status == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Status</strong>';
-      			}
-
-				if ($member == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Member</strong>';
-      			}
-
-				if ($cat == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Category</strong>';
-      			}
+      			if (empty($name)) { $formErrors[] = 'Name Can\'t be <strong>Empty</strong>'; }
+				if (empty($desc)) { $formErrors[] = 'Description Can\'t be <strong>Empty</strong>'; }
+      			if (empty($price)) { $formErrors[] = 'Price Can\'t be <strong>Empty</strong>'; }
+				if ($status == 0) { $formErrors[] = 'You Must Choose The <strong>Status</strong>'; }
+				if ($member == 0) { $formErrors[] = 'You Must Choose The <strong>Member</strong>'; }
+				if ($cat == 0) { $formErrors[] = 'You Must Choose The <strong>Category</strong>'; }
 
       			// Loop Into Errors Array And Echo It
-
       			foreach($formErrors as $error) {
       				echo '<div class="alert alert-danger">' . $error . '</div>';
       			}
 
       			// Check If There's No Error Proceed The Update Operation
-
       			if (empty($formErrors)) {
 
 	      			// Update The Database With This Info
-
-	      			$stmt = $con->prepare("UPDATE 
-	      										items 
-	      								   SET 
+	      			$stmt = $con->prepare("UPDATE items SET 
 	      								   		Name = ?,
 	      								   		Description = ?, 
-	      								   		Price = ?, 
-	      								   		Country_Made = ?,
+	      								   		Price = ?,
 	      								   		Status = ?,
 	      								   		Cat_ID = ?,
 	      								   		Member_ID = ?,
@@ -716,12 +679,10 @@
 	      								   WHERE 
 	      								   		Item_ID = ?");
 
-	      			$stmt->execute(array($name, $desc, $price, $country, $status, $cat, $member, $tags, $id));
+	      			$stmt->execute(array($name, $desc, $price, $status, $cat, $member, $tags, $id));
 
 	       			// Echo Success Message
-	 
 	      			$theMsg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Updated</div>';
-
 	      			redirectHome($theMsg, 'back');
 
       			}
@@ -729,7 +690,6 @@
       		} else {
 
       			$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
-
       			redirectHome($theMsg);
 
       		}
