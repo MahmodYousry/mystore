@@ -164,14 +164,12 @@
 		} elseif ($do == 'Insert') {
 
 			// Insert Members Page
-
       		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 	      		echo '<h1 class="text-center">Insert Member</h1>';
 	      		echo '<div class="container">';
 
 	      		// Upload Variables
-
 	      		$avatarName = $_FILES['avatar']['name'];
 	      		$avatarSize =  $_FILES['avatar']['size'];
 	      		$avatarTmp 	=  $_FILES['avatar']['tmp_name'];
@@ -181,68 +179,40 @@
 	     		$avatarAllowedExtension = array("jpeg", "jpg", "png", "gif");
 
 	     		// Get Avatar Extension
-
 	     		$string = 'Osama.ahmed.sayed.ali';
-
-	     		$avatarExtension = strtolower(end(explode('.', $avatarName)));	      		
+				// explose shortcut for php 8 need
+				$explodeThispl = explode('.', $avatarName);
+	     		$avatarExtension = strtolower(end($explodeThispl));	      		
 
       			// Get Variables From The Form
-
       			$user 	= $_POST['username'];
       			$pass 	= $_POST['password'];
       			$email 	= $_POST['email'];
       			$name 	= $_POST['full'];
-
       			$hashPass = sha1($_POST['password']);
 
       			// Validate The Form
-
       			$formErrors = array();
 
       			if (strlen($user) < 4) {
       				$formErrors[] = '<div class="alert alert-danger">Username Can\'t Be Less Than <strong>4 Characters</strong></div>';
       			}
 
-				if (strlen($user) > 20) {
-      				$formErrors[] = 'Username Can\'t Be More Than <strong>20 Characters</strong>';
-      			}
-
-      			if (empty($user)) {
-      				$formErrors[] = 'Username Can\'t Be <strong>Empty</strong>';
-      			}
-
-      			if (empty($pass)) {
-					$formErrors[] = 'Password Can\'t Be <strong>Empty</strong>';
-      			}
-
-				if (empty($name)) {
-					$formErrors[] = 'Full Name Can\'t Be <strong>Empty</strong>';
-      			}
-
-      			if (empty($email)) {
-					$formErrors[] = 'Email Can\'t Be <strong>Empty</strong>';
-      			}
-
+				if (strlen($user) > 20) { $formErrors[] = 'Username Can\'t Be More Than <strong>20 Characters</strong>'; }
+      			if (empty($user)) { $formErrors[] = 'Username Can\'t Be <strong>Empty</strong>'; }
+      			if (empty($pass)) { $formErrors[] = 'Password Can\'t Be <strong>Empty</strong>'; }
+				if (empty($name)) { $formErrors[] = 'Full Name Can\'t Be <strong>Empty</strong>'; }
+      			if (empty($email)) { $formErrors[] = 'Email Can\'t Be <strong>Empty</strong>'; }
       			if (! empty($avatarName) && ! in_array($avatarExtension, $avatarAllowedExtension)) {
 	     			$formErrors[] = 'This Extension Is Not <strong>Allowed</strong>';
 	     		}
-
-	     		if (empty($avatarName)) {
-	     			$formErrors[] = 'Avatar Is <strong>Required</strong>';
-	     		}
-
-	     		if ($avatarSize > 6194304) {
-	     			$formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>';
-	     		}
+	     		if (empty($avatarName)) { $formErrors[] = 'Avatar Is <strong>Required</strong>'; }
+	     		if ($avatarSize > 6194304) { $formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>'; }
 
       			// Loop Into Errors Array And Echo It
-
-      			foreach($formErrors as $error) {
-      				echo '<div class="alert alert-danger">' . $error . '</div>';
-      			}
+      			foreach($formErrors as $error) { echo '<div class="alert alert-danger">' . $error . '</div>'; }
 
       			// Check If There's No Error Proceed The Update Operation
-
       			if (empty($formErrors)) {
 
       				$avatar = rand(0, 1000000000) . '_' . $avatarName;
@@ -256,7 +226,6 @@
       				if ($check == 1) {
 
       					$theMsg = "<div class='alert alert-danger'>Sorry This User Is Exist</div>";
-
       					redirectHome($theMsg, 'back');
 
       				} else {
@@ -288,11 +257,8 @@
       		} else {
 
       			echo '<div class="container">';
-
       			$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
-
       			redirectHome($theMsg);
-
       			echo '</div>';
 
       		}
@@ -302,28 +268,15 @@
 		} elseif ($do == 'Edit') {
 
       		// Check If Get Request useerid Is Numberic & Get The Integer Value of it.
-
 			$userid = isset($_GET['userid']) && is_numeric($_GET['userid']) ? intval($_GET['userid']) : 0;
 
 			// Select All Data Depend on This ID
-
 			$stmt = $con->prepare("SELECT * FROM users WHERE UserID = ? LIMIT 1");
-			
-			// Excute Query
-
-			$stmt->execute(array($userid));
-
-			// Fetch The Data
-
+			$stmt->execute([$userid]);
 			$row = $stmt->fetch();
-
-			// The Row Count
-
 			$count = $stmt->rowCount();
 
 			// If There\s Such ID Show The Form
-
-
 			if($count > 0) { ?>
 
 		      	<h1 class="text-center">Edit Member</h1>
@@ -414,123 +367,71 @@
 	     		// List Of Allowed File Types To Upload
 	     		$avatarAllowedExtension = array("jpeg", "jpg", "png", "gif");
 
-	     		// Get Avatar Extension
-
-	     		$avatarExtension = strtolower(end(explode('.', $avatarName)));
+				// explode short cut
+				$explose_thispl = explode('.', $avatarName);
+	     		$avatarExtension = strtolower(end($explose_thispl));
 
       			// Get Variables From The Form
-
       			$id 	= $_POST['userid'];
       			$user 	= $_POST['username'];
       			$email 	= $_POST['email'];
       			$name 	= $_POST['full'];
 
-      			//Password Trick
-
+      			// Password Trick
       			$pass = empty($_POST['newpassword']) ? $_POST['oldpassword'] : sha1($_POST['newpassword']);
 
       			// Validate The Form
-
       			$formErrors = array();
 
       			if (strlen($user) < 4) {
-
-      				$formErrors[] = '<div class="alert alert-danger">Username Can\'t Be Less Than <strong>4 Characters</strong></div>';
-
+					$formErrors[] = '<div class="alert alert-danger">Username Can\'t Be Less Than <strong>4 Characters</strong></div>';
       			}
 
-				if (strlen($user) > 20) {
-
-      				$formErrors[] = 'Username Can\'t Be More Than <strong>20 Characters</strong>';
-
-      			}
-
-
-      			if (empty($user)) {
-
-      				$formErrors[] = 'Username Can\'t Be <strong>Empty</strong>';
-
-      			}
-
-				if (empty($name)) {
-
-					$formErrors[] = 'Full Name Can\'t Be <strong>Empty</strong>';
-
-      			}
-
-      			if (empty($email)) {
-
-					$formErrors[] = 'Email Can\'t Be <strong>Empty</strong>';
-      				
-      			}
+				if (strlen($user) > 20) {$formErrors[] = 'Username Can\'t Be More Than <strong>20 Characters</strong>'; }
+      			if (empty($user)) {$formErrors[] = 'Username Can\'t Be <strong>Empty</strong>'; }
+				if (empty($name)) {$formErrors[] = 'Full Name Can\'t Be <strong>Empty</strong>'; }
+      			if (empty($email)) {$formErrors[] = 'Email Can\'t Be <strong>Empty</strong>';}
 				
 				if (! empty($avatarName) && ! in_array($avatarExtension, $avatarAllowedExtension)) {
 	     			$formErrors[] = 'This Extension Is Not <strong>Allowed</strong>';
 	     		}
-
-	     		if (empty($avatarName)) {
-	     			$formErrors[] = 'Avatar Is <strong>Required</strong>';
-	     		}
-
-	     		if ($avatarSize > 6194304) {
-	     			$formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>';
-	     		}
+	     		if (empty($avatarName)) {$formErrors[] = 'Avatar Is <strong>Required</strong>';}
+	     		if ($avatarSize > 6194304) {$formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>';}
 
       			// Loop Into Errors Array And Echo It
-
-      			foreach($formErrors as $error) {
-
-      				echo '<div class="alert alert-danger">' . $error . '</div>';
-
-      			}
+      			foreach($formErrors as $error) {echo '<div class="alert alert-danger">' . $error . '</div>';}
 
       			// Check If There's No Error Proceed The Update Operation
-
       			if (empty($formErrors)) {
 					
 					$avatar = rand(0, 1000000000) . '_' . $avatarName;
-
       				move_uploaded_file($avatarTmp, "uploads\avatars\\" . $avatar);
 
-      				$stmt2 = $con->prepare("SELECT 
-      											* 
-      										FROM 
-      											users
-      										WHERE
-      											Username = ? 
-      										AND 
-      											UserID != ?");
-
-      				$stmt2->execute(array($user, $id));
-
+      				$stmt2 = $con->prepare("SELECT * FROM users WHERE Username = ? AND UserID != ?");
+      				$stmt2->execute([$user, $id]);
       				$count = $stmt2->rowCount();
 
       				if ($count == 1) {
 
       					$theMsg = '<div class="alert alert-danger">Sorry This User Is Exist</div>';
-
       					redirectHome($theMsg, 'back');
 
       				} else {
 
       					// Update The Database With This Info
-
 		      			$stmt = $con->prepare("UPDATE users SET Username = ?, Email = ?, FullName = ?, Password = ?, avatar = ?  WHERE UserID = ?");
 		      			$stmt->execute(array($user, $email, $name, $pass, $avatar, $id));
 
 		       			// Echo Success Message
-		 
 		      			$theMsg = "<div class='alert alert-success'>" . $stmt->rowCount() . ' Record Updated</div>';
-
 		      			redirectHome($theMsg, 'back');
 
-	      				}
+	      			}
       			}
 
       		} else {
 
       			$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
-
       			redirectHome($theMsg);
 
       		}
