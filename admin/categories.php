@@ -7,39 +7,35 @@
 	*/
 
 	ob_start(); // OutPut Buffering Start
-
 	session_start();
-
 	$pageTitle = 'Categories';
-
     if (isset($_SESSION['Username'])) {
 
       include 'init.php';
-
       $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
 
 	    if ($do == 'Manage') {
 
 	    	$sort = 'ASC';
-
 	    	$sort_array = array('ASC', 'DESC');
-
 	    	if (isset($_GET['sort']) && in_array($_GET['sort'], $sort_array)) {
-
 	    		$sort = $_GET['sort'];
-
 	    	}
 
 	      	$stmt2 = $con->prepare("SELECT * FROM categories WHERE parent = 0 ORDER BY ordering $sort");
-
 	      	$stmt2->execute();
-
 	      	$cats = $stmt2->fetchAll();
 
 	      	?>
 
 	      	<h1 class="text-center">Manage Categories</h1>
+			  
 	      	<div class="container categories">
+			  	<div class="members-options">
+			  		<a class="btn btn-primary" href="categories.php?do=Add"/><i class="fa fa-plus"></i> Add New Category</a>
+					<a class="btn btn-primary btn-md" href="dashboard.php">back <i class='fa fa-chevron-right'></i></a>
+				</div>
+			  	
 	      		<div class="panel panel-default">
 	      			<div class="panel-heading">
 	      			<i class="fa fa-edit"></i> Manage Categories
@@ -86,7 +82,7 @@
 	      				?>
 	      			</div>
 	      		</div>
-	      		<a class="add-category btn btn-primary" href="categories.php?do=Add"/><i class="fa fa-plus"></i> Add New Category</a>
+	      		
 	      	</div>
 
 	      	<?php
@@ -185,7 +181,8 @@
 					<!-- Start submit Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">
-							<input type="submit" value="Add Category" class="btn btn-primary btn-lg" />
+							<input type="submit" value="Add Category" class="btn btn-primary btn-md" />
+							<a class="btn btn-primary btn-md" href="categories.php">back <i class='fa fa-chevron-right'></i></a>
 						</div>
 					</div>
 					<!-- END submit Field -->
@@ -269,28 +266,21 @@
 	    } elseif ($do == 'Edit') {
 
 	    	// Check If Get Request catid Is Numberic & Get The Integer Value of it.
-
 			$catid = isset($_GET['catid']) && is_numeric($_GET['catid']) ? intval($_GET['catid']) : 0;
 
 			// Select All Data Depend on This ID
-
 			$stmt = $con->prepare("SELECT * FROM categories WHERE ID = ?");
 			
 			// Excute Query
-
 			$stmt->execute(array($catid));
 
 			// Fetch The Data
-
 			$cat = $stmt->fetch();
 
 			// The Row Count
-
 			$count = $stmt->rowCount();
 
 			// If There\s Such ID Show The Form
-
-
 			if($count > 0) { ?>
 
 				<h1 class="text-center">Edit Category</h1>
@@ -388,7 +378,8 @@
 						<!-- Start submit Field -->
 						<div class="form-group form-group-lg">
 							<div class="col-sm-offset-2 col-sm-10">
-								<input type="submit" value="Save" class="btn btn-primary btn-lg" />
+								<input type="submit" value="Save" class="btn btn-primary btn-md" />
+								<a class="btn btn-primary btn-md" href="categories.php">back <i class="fa fa-chevron-right fa-xs"></i></a>
 							</div>
 						</div>
 						<!-- END submit Field -->
@@ -398,15 +389,11 @@
       <?php
 
       		// If Theres No such ID show Error Message
-
       		} else {
 
       			echo '<div class="container">';
-
       			$theMsg = '<div class="alert alert-danger">There\'s no such id</div>';
-
       			redirectHome($theMsg);
-
       			echo '</div>';
 
       		}

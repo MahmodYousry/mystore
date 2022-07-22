@@ -37,7 +37,7 @@
                         }
                         
                     } else { // if file doesnot exits
-                        echo 'No avatar Found For this user';
+                        echo 'No avatar Found For this user as file';
                     }
 
                     

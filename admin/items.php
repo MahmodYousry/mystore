@@ -7,19 +7,14 @@
 	*/
 
 	ob_start(); // OutPut Buffering Start
-
 	session_start();
-
 	$pageTitle = 'Items';
 
     if (isset($_SESSION['Username'])) {
-
       include 'init.php';
-
       $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
 
 	    if ($do == 'Manage') {
-
       	// Select All Users Except Admin
 
       	$stmt = $con->prepare("SELECT 
@@ -40,12 +35,7 @@
 								ORDER BY 
       						   		Item_ID DESC");
 
-      	// Excute The Statement
-
       	$stmt->execute();
-
-      	//	Assign To Variable
-
       	$items = $stmt->fetchAll();
 
       	if (! empty($items)) {
@@ -54,7 +44,12 @@
 
 			<h1 class="text-center">Manage Items</h1>
 			<div class="container">
-				<a class="new-item-button btn btn-sm btn-primary" href="items.php?do=Add"><i class="fa fa-plus"></i> New Item</a>
+				<div class="members-options">
+					<a class="btn btn-md btn-primary" href="items.php?do=Add"><i class="fa fa-plus"></i> New Item</a>
+					<a class="btn btn-primary btn-md" href="dashboard.php">back 
+						<i class="fa fa-chevron-right fa-xs"></i>
+					</a>
+				</div>
 				<div class="table-responsive">
 					<table class="main-table text-center table table-bordered">
 						<tr>
@@ -118,7 +113,7 @@
 					<!-- Start Name Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Name</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<input 
 								type="text" 
 								name="name" 
@@ -131,7 +126,7 @@
 					<!-- Start Description Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Description</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<input 
 								type="text" 
 								name="description" 
@@ -144,7 +139,7 @@
 					<!-- Start Price Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Price</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<input 
 								type="text" 
 								name="price" 
@@ -155,9 +150,9 @@
 					</div>
 					<!-- END Price Field -->
 					<!-- Start Country Field -->
-					<div class="form-group form-group-lg">
+					<!-- <div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Country</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<input 
 								type="text" 
 								name="country" 
@@ -165,12 +160,12 @@
 								required="required" 
 								placeholder="Country of Made" />
 						</div>
-					</div>
+					</div> -->
 					<!-- END Country Field -->
 					<!-- Start Status Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Status</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<select name="status">
 								<option value="0">...</option>
 								<option value="1">New</option>
@@ -184,7 +179,7 @@
 					<!-- Start Members Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Member</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<select name="member">
 								<option value="0">...</option>
 								<?php
@@ -200,7 +195,7 @@
 					<!-- Start Categories Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Category</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<select name="category">
 								<option value="0">...</option>
 								<?php
@@ -220,7 +215,7 @@
 					<!-- Start Tags Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Tags</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-8">
 							<input 
 								type="text" 
 								name="tags" 
@@ -233,6 +228,9 @@
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">
 							<input type="submit" value="Add Item" class="btn btn-primary btn-sm" />
+							<a class="btn btn-primary btn-sm" href="items.php">back 
+								<i class="fa fa-chevron-right fa-xs"></i>
+							</a>
 						</div>
 					</div>
 					<!-- END submit Field -->
@@ -254,7 +252,7 @@
       			$name 		= $_POST['name'];
       			$desc 		= $_POST['description'];
       			$price 		= $_POST['price'];
-      			$country 	= $_POST['country'];
+      			//$country 	= $_POST['country'];
       			$status 	= $_POST['status'];
       			$member 	= $_POST['member'];
       			$cat 		= $_POST['category'];
@@ -264,83 +262,48 @@
 
       			$formErrors = array();
 
-      			if (empty($name)) {
-      				$formErrors[] = 'Name Can\'t be <strong>Empty</strong>';
-      			}
-
-				if (empty($desc)) {
-      				$formErrors[] = 'Description Can\'t be <strong>Empty</strong>';
-      			}
-
-      			if (empty($price)) {
-      				$formErrors[] = 'Price Can\'t be <strong>Empty</strong>';
-      			}
-
-      			if (empty($country)) {
-					$formErrors[] = 'Country Can\'t be <strong>Empty</strong>';
-      			}
-
-				if ($status == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Status</strong>';
-      			}
-
-				if ($member == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Member</strong>';
-      			}
-
-				if ($cat == 0) {
-					$formErrors[] = 'You Must Choose The <strong>Category</strong>';
-      			}
+      			if (empty($name)) { $formErrors[] = 'Name Can\'t be <strong>Empty</strong>'; }
+				if (empty($desc)) { $formErrors[] = 'Description Can\'t be <strong>Empty</strong>'; }
+      			if (empty($price)) { $formErrors[] = 'Price Can\'t be <strong>Empty</strong>'; }
+      			//if (empty($country)) { $formErrors[] = 'Country Can\'t be <strong>Empty</strong>'; }
+				if ($status == 0) { $formErrors[] = 'You Must Choose The <strong>Status</strong>'; }
+				if ($member == 0) { $formErrors[] = 'You Must Choose The <strong>Member</strong>'; }
+				if ($cat == 0) { $formErrors[] = 'You Must Choose The <strong>Category</strong>'; }
 
       			// Loop Into Errors Array And Echo It
-
       			foreach($formErrors as $error) {
-
       				echo '<div class="alert alert-danger">' . $error . '</div>';
-
       			}
 
       			// Check If There's No Error Proceed The Update Operation
-
       			if (empty($formErrors)) {
 
-		      			// Insert Userinfo To Database
+					// Insert Userinfo To Database
+					$stmt = $con->prepare("INSERT INTO 
+							items(Name, Description, Price, Country_Made, Status, Add_Date, Cat_ID, Member_ID, tags)
+						VALUES(:zname, :zdesc, :zprice, :zcountry, :zstatus, now(), :zcat, :zmember, :ztags)");
 
-	      				$stmt = $con->prepare("INSERT INTO 
+					$stmt->execute(array(
+						'zname'		=> $name,
+						'zdesc'		=> $desc,
+						'zprice'	=> $price,
+						'zcountry'	=> $country,
+						'zstatus'	=> $status,
+						'zcat'		=> $cat,
+						'zmember'	=> $member,
+						'ztags'		=> $tags
+					));
 
-	      						items(Name, Description, Price, Country_Made, Status, Add_Date, Cat_ID, Member_ID, tags)
-
-	      					VALUES(:zname, :zdesc, :zprice, :zcountry, :zstatus, now(), :zcat, :zmember, :ztags)");
-
-	      				$stmt->execute(array(
-
-	      					'zname'		=> $name,
-	      					'zdesc'		=> $desc,
-							'zprice'	=> $price,
-	      					'zcountry'	=> $country,
-	      					'zstatus'	=> $status,
-	      					'zcat'		=> $cat,
-	      					'zmember'	=> $member,
-	      					'ztags'		=> $tags
-
-						));
-
-		       			// Echo Success Message
-		 
-		      			$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Inserted</div>';
-
-		      			redirectHome($theMsg, 'back');
-
+					// Echo Success Message
+					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Inserted</div>';
+					redirectHome($theMsg, 'back');
       			}
 
       		} else {
 
       			echo '<div class="container">';
-
-      			$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
-
-      			redirectHome($theMsg);
-
+					$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
+					redirectHome($theMsg);
       			echo '</div>';
 
       		}

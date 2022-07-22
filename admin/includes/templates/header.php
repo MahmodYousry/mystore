@@ -11,7 +11,6 @@
         <link rel="stylesheet" href="<?php echo $css; ?>backend.css" />
 
         <script src="<?php echo $js; ?>jquery-2.2.4.min.js"></script>
-        <script src="<?php echo $js; ?>ajaxFunctions.js"></script>
         <script>
             $(document).ready(function () {
 

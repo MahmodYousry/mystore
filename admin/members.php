@@ -36,7 +36,7 @@
 		<div class="container">
 			<div class="members-options">
 				<a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> New Member</a>
-				<a class="btn btn-primary btn-md" href="members.php"><i class='fa fa-chevron-right'></i> back</a>
+				<a class="btn btn-primary btn-md" href="dashboard.php">back <i class='fa fa-chevron-right'></i></a>
 			</div>
 			<div class="table-responsive">
 				<table class="main-table manage-members text-center table table-bordered">
@@ -49,38 +49,42 @@
 						<td>Registered Date</td>
 						<td>Control</td>
 					</tr>
-
+					
 					<?php
+						
 						foreach ($rows as $row) {
-							echo "<tr>";
-								echo "<td>" . $row['UserID'] . "</td>";
-								echo "<td>";
-								if (empty($row['avatar'])) { // if no avatar
-									echo 'No Image';
-								} else { // if avatar exist
-									echo "<img src='uploads/avatars/" . $row['avatar'] . "' alt=''/>";
-								}
-								echo "</td>";
-								echo "<td>" . $row['Username'] . "</td>";
-								echo "<td>" . $row['Email'] . "</td>";
-								echo "<td>" . $row['FullName'] . "</td>";
-								echo "<td>" . $row['Date'] . "</td>";
-								echo "<td>
-										<a href='members.php?do=Edit&userid=" . $row['UserID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
-										<a href='members.php?do=Delete&userid=" . $row['UserID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
-										if (empty($row['avatar'])) { // if no avatar
-											echo "<a href='members.php?do=EditAvatar&userid=" . $row['UserID'] . "' class='btn btn-primary'><i class='fa fa-edit'></i> add avatar</a>";
-										} else { // if avatar exist
-											echo "<button onclick='deleteAvatar(".$row['UserID'].");' id='avatarDelete' class='btn btn-danger text-capitalize'><i class='fa fa-close'></i> delete avatar</button>";
-										}
+							echo "<tr id='tbody'>";
+								echo "<tr>";
+									echo "<td>" . $row['UserID'] . "</td>";
+									echo "<td>";
+									if (empty($row['avatar'])) { // if no avatar
+										echo 'No Image';
+									} else { // if avatar exist
+										echo "<img src='uploads/avatars/" . $row['avatar'] . "' alt=''/>";
+									}
+									echo "</td>";
+									echo "<td>" . $row['Username'] . "</td>";
+									echo "<td>" . $row['Email'] . "</td>";
+									echo "<td>" . $row['FullName'] . "</td>";
+									echo "<td>" . $row['Date'] . "</td>";
+									echo "<td>
+											<a href='members.php?do=Edit&userid=" . $row['UserID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
+											<a href='members.php?do=Delete&userid=" . $row['UserID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+											if (empty($row['avatar'])) { // if no avatar
+												echo "<a href='members.php?do=EditAvatar&userid=" . $row['UserID'] . "' class='btn btn-primary'><i class='fa fa-edit'></i> add avatar</a>";
+											} else { // if avatar exist
+												echo "<button onclick='deleteAvatar(".$row['UserID'].");' id='avatarDelete' class='btn btn-danger text-capitalize'><i class='fa fa-close'></i> delete avatar</button>";
+											}
 
-										if ($row['RegStatus'] == 0) {
-											echo "<a href='members.php?do=Activate&userid=" . $row['UserID'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Activate</a>";
-										}
-								echo "</td>";
+											if ($row['RegStatus'] == 0) {
+												echo "<a href='members.php?do=Activate&userid=" . $row['UserID'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Activate</a>";
+											}
+									echo "</td>";
+								echo "</tr>";
 							echo "</tr>";
 						}
 					?>
+					
 
 				</table>
 			</div>
@@ -212,11 +216,9 @@
       			if (empty($formErrors)) {
 
       				$avatar = rand(0, 1000000000) . '_' . $avatarName;
-
-      				move_uploaded_file($avatarTmp, "uploads\avatars\\" . $avatar);
+      				move_uploaded_file($avatarTmp, "uploads/avatars/" . $avatar);
 
       				// Check If User Is Exist In Database
-
       				$check = checkItem("Username", "users", $user);
 
       				if ($check == 1) {
@@ -227,24 +229,18 @@
       				} else {
 
 		      			// Insert Userinfo To Database
-
-	      				$stmt = $con->prepare("INSERT INTO 
-							      					users(Username, Password, Email, FullName, RegStatus, Date, avatar) 
+	      				$stmt = $con->prepare("INSERT INTO users(Username, Password, Email, FullName, RegStatus, Date, avatar) 
 							      				VALUES(:zuser, :zpass, :zmail, :zname, 1, now(), :zavatar) ");
 	      				$stmt->execute(array(
-
 	      					'zuser' 	=> $user,
 	      					'zpass' 	=> $hashPass,
 	      					'zmail' 	=> $email,
 	      					'zname' 	=> $name,
 	      					'zavatar' 	=> $avatar
-
-	      					));
+	      				));
 
 		       			// Echo Success Message
-		 
 		      			$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Inserted</div>';
-
 		      			redirectHome($theMsg, 'back');
 
 					}
@@ -431,7 +427,14 @@
       		echo '</div>';
 
 
-      	} elseif ($do == 'Activate') {
+      	} elseif ($do == 'EditAvatar') {
+
+			echo '<h1 class="text-center">Activate Member</h1>';
+      		echo '<div class="container">';
+
+			echo '</div>';
+
+		} elseif ($do == 'Activate') {
 
       		echo '<h1 class="text-center">Activate Member</h1>';
       		echo '<div class="container">';
