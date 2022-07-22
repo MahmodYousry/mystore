@@ -234,6 +234,10 @@ h1 {
   color:#666;
 }
 
+.members-options {
+  margin-bottom: 5px;
+}
+
 .show-pass {
   position: absolute;
   top:6px;
@@ -262,10 +266,12 @@ h1 {
 }
 
 .main-table .btn {
-  padding: 3px 10px;
-  margin: 4px 0;
+  padding: 5px 10px;
+  margin: 5px 0;
   width: 100%;
   display: block;
+  text-align: left;
+  border-radius: 3px;
 }
 
 .activate {

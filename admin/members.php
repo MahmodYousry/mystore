@@ -8,47 +8,36 @@
 	*/
 
 	ob_start(); // OutPut Buffering Start
-
 	session_start();
-
 	$pageTitle = 'Members';
     
     if (isset($_SESSION['Username'])) {
 
       include 'init.php';
-
       $do = isset($_GET['do']) ? $_GET['do'] : 'Manage';
 
       // Start Manage Page
-
       if ($do == 'Manage') { // Manage Members Page
-
       	$query = '';
 
-      	if (isset($_GET['page']) && $_GET['page'] == 'Pending') {
-
-      		$query = 'AND RegStatus = 0';
-
-      	}
+      	if (isset($_GET['page']) && $_GET['page'] == 'Pending') { 
+			$query = 'AND RegStatus = 0';
+		}
 
       	// Select All Users Except Admin
-
       	$stmt = $con->prepare("SELECT * FROM users Where GroupID != 1 $query ORDER BY UserID DESC");
-
-      	// Excute The Statement
-
       	$stmt->execute();
-
-      	//	Assign To Variable
-
       	$rows = $stmt->fetchAll();
 
       	if (! empty($rows)) {
-
       	?>
 
 		<h1 class="text-center">Manage Members</h1>
 		<div class="container">
+			<div class="members-options">
+				<a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> New Member</a>
+				<a class="btn btn-primary btn-md" href="members.php"><i class='fa fa-chevron-right'></i> back</a>
+			</div>
 			<div class="table-responsive">
 				<table class="main-table manage-members text-center table table-bordered">
 					<tr>
@@ -66,9 +55,9 @@
 							echo "<tr>";
 								echo "<td>" . $row['UserID'] . "</td>";
 								echo "<td>";
-								if (empty($row['avatar'])) {
+								if (empty($row['avatar'])) { // if no avatar
 									echo 'No Image';
-								} else {
+								} else { // if avatar exist
 									echo "<img src='uploads/avatars/" . $row['avatar'] . "' alt=''/>";
 								}
 								echo "</td>";
@@ -77,8 +66,14 @@
 								echo "<td>" . $row['FullName'] . "</td>";
 								echo "<td>" . $row['Date'] . "</td>";
 								echo "<td>
-										<a href='members.php?do=Edit&userid=" . $row['UserID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edite</a>
+										<a href='members.php?do=Edit&userid=" . $row['UserID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
 										<a href='members.php?do=Delete&userid=" . $row['UserID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+										if (empty($row['avatar'])) { // if no avatar
+											echo "<a href='members.php?do=EditAvatar&userid=" . $row['UserID'] . "' class='btn btn-primary'><i class='fa fa-edit'></i> add avatar</a>";
+										} else { // if avatar exist
+											echo "<button onclick='deleteAvatar(".$row['UserID'].");' id='avatarDelete' class='btn btn-danger text-capitalize'><i class='fa fa-close'></i> delete avatar</button>";
+										}
+
 										if ($row['RegStatus'] == 0) {
 											echo "<a href='members.php?do=Activate&userid=" . $row['UserID'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Activate</a>";
 										}
@@ -89,7 +84,7 @@
 
 				</table>
 			</div>
-			<a href="members.php?do=Add" class="btn btn-primary"><i class="fa fa-plus"></i> New Member</a>
+			
 		</div>
 
 		<?php } else {
@@ -111,7 +106,7 @@
 				<!-- Start Username Field -->
 				<div class="form-group form-group-lg">
 					<label class="col-sm-2 control-label">Username</label>
-					<div class="col-sm-10 col-md-6">
+					<div class="col-sm-10 col-md-8">
 						<input type="text" name="username" class="form-control" autocomplete="off" required="required" placeholder="Username To Login Into Shop" />
 					</div>
 				</div>
@@ -119,7 +114,7 @@
 				<!-- Start Password Field -->
 				<div class="form-group form-group-lg">
 					<label class="col-sm-2 control-label">Password</label>
-					<div class="col-sm-10 col-md-6">
+					<div class="col-sm-10 col-md-8">
 						<input type="password" name="password" class="password form-control" autocomplete="new-password" required="required" placeholder="Password Must Be Hard & Complex" />
 						<i class="show-pass fa fa-eye fa-2x"></i>
 					</div>
@@ -128,7 +123,7 @@
 				<!-- Start Email Field -->
 				<div class="form-group form-group-lg">
 					<label class="col-sm-2 control-label">Email</label>
-					<div class="col-sm-10 col-md-6">
+					<div class="col-sm-10 col-md-8">
 						<input type="email" name="email" class="form-control" required="required" placeholder="Email Must Be Valid" />
 					</div>
 				</div>
@@ -136,7 +131,7 @@
 				<!-- Start Full Name Field -->
 				<div class="form-group form-group-lg">
 					<label class="col-sm-2 control-label">Full Name</label>
-					<div class="col-sm-10 col-md-6">
+					<div class="col-sm-10 col-md-8">
 						<input type="text" name="full" class="form-control" required="required" placeholder="Full Name Appear In Your Profile Page" />
 					</div>
 				</div>
@@ -144,7 +139,7 @@
 				<!-- Start Avatar Field -->
 				<div class="form-group form-group-lg">
 					<label class="col-sm-2 control-label">User Avatar</label>
-					<div class="col-sm-10 col-md-6">
+					<div class="col-sm-10 col-md-8">
 						<input type="file" name="avatar" class="form-control" required="required" />
 					</div>
 				</div>
@@ -152,7 +147,8 @@
 				<!-- Start submit Field -->
 				<div class="form-group form-group-lg">
 					<div class="col-sm-offset-2 col-sm-10">
-						<input type="submit" value="Add Member" class="btn btn-primary btn-lg" />
+						<input type="submit" value="Add Member" class="btn btn-primary btn-md" />
+						<a class="btn btn-primary btn-md" href="members.php">back</a>
 					</div>
 				</div>
 				<!-- END submit Field -->
@@ -341,11 +337,8 @@
       		} else {
 
       			echo '<div class="container">';
-
-      			$theMsg = '<div class="alert alert-danger">There\'s no such id</div>';
-
-      			redirectHome($theMsg);
-
+					$theMsg = '<div class="alert alert-danger">There\'s no such id</div>';
+					redirectHome($theMsg);
       			echo '</div>';
 
       		}
@@ -358,7 +351,6 @@
       		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				
 				// Upload Variables
-
 	      		$avatarName =  $_FILES['avatar']['name'];
 	      		$avatarSize =  $_FILES['avatar']['size'];
 	      		$avatarTmp 	=  $_FILES['avatar']['tmp_name'];
@@ -439,79 +431,109 @@
       		echo '</div>';
 
 
-      	} elseif ($do == 'Delete') {  // Delete Members Page
-
-      		echo '<h1 class="text-center">Delete Member</h1>';
-      		echo '<div class="container">';
-
-	      		// Check If Get Request useerid Is Numberic & Get The Integer Value of it.
-
-				$userid = isset($_GET['userid']) && is_numeric($_GET['userid']) ? intval($_GET['userid']) : 0;
-
-				// Select All Data Depend on This ID
-
-				$check = checkItem('userid', 'users', $userid);
-
-				// If There's Such ID Show The Form
-
-				if($check > 0) {
-
-					$stmt = $con->prepare("DELETE FROM users WHERE UserID = :zuser");
-
-					$stmt->bindParam(":zuser", $userid);
-
-					$stmt->execute();
-
-					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Deleted</div>';
-
-					redirectHome($theMsg, 'back');
-
-				} else {
-
-					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
-
-					redirectHome($theMsg);
-
-				}
-
-			echo '</div>';
-
       	} elseif ($do == 'Activate') {
 
       		echo '<h1 class="text-center">Activate Member</h1>';
       		echo '<div class="container">';
 
 	      		// Check If Get Request useerid Is Numberic & Get The Integer Value of it.
-
 				$userid = isset($_GET['userid']) && is_numeric($_GET['userid']) ? intval($_GET['userid']) : 0;
 
 				// Select All Data Depend on This ID
-
 				$check = checkItem('userid', 'users', $userid);
 
 				// If There's Such ID Show The Form
+				if($check > 0) { // if user exist do the condition
 
-				if($check > 0) {
-
+					// update the info to activate
 					$stmt = $con->prepare("UPDATE users SET RegStatus = 1 WHERE UserID = ?");
-
 					$stmt->execute(array($userid));
-
+					// echo message for success
 					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Updated</div>';
-
 					redirectHome($theMsg);
 
-				} else {
-
-					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
-
+				} else { // if user is not exist echo msg to tell
+					$theMsg = '<div class="alert alert-danger">This User Does Not Exist</div>';
 					redirectHome($theMsg);
-
 				}
 
 			echo '</div>';
 
-      	}
+      	} elseif ($do == 'Delete') {  // Delete Members Page
+
+			echo '<h1 class="text-center">Delete Member</h1>';
+			echo '<div class="container">';
+
+			// Check If Get Request useerid Is Numberic & Get The Integer Value of it.
+			$userid = isset($_GET['userid']) && is_numeric($_GET['userid']) ? intval($_GET['userid']) : 0;
+
+			// Select All Data Depend on This ID
+			$check = checkItem('userid', 'users', $userid);
+
+			// If There's Such ID Show The Form
+			if($check > 0) {
+
+				$checkAvatar = avatarCheck('avatar', 'users', 'UserID = ', $userid);
+
+				if ($checkAvatar > 0) { // if There is Avatar For this User
+					$stmt1 = $con->prepare("SELECT avatar FROM users WHERE UserID = ?");
+					$stmt1->execute([$userid]);
+					$avatr = $stmt1->fetch();
+
+					echo '<div class="alert alert-success">Avatar Check Found One Avatar For This User</div>';
+
+					$avUrl = "uploads/avatars/" . $avatr['avatar'];
+
+					if (file_exists($avUrl)) { // if file exits
+
+						echo '<div class="alert alert-primary">There is Avatar For This User</div>';
+
+						if (unlink($avUrl)) { // Delete Avatar Photo File From the Server using the url given
+							// show succes message for Avatar Deleted
+							echo '<div class="alert alert-success">' . $stmt1->rowCount() . ' Avatar Deleted</div>';
+							// begin to delete the user from Database
+							$stmt = $con->prepare("DELETE FROM users WHERE UserID = ?");
+							$stmt->execute([$userid]);
+							// show succes message for User Deleted from Database
+							$theMsg = '<div class="alert alert-success">' . $stmt1->rowCount() . ' User Is Deleted from Database</div>';
+							redirectHome($theMsg, 'back');
+						} else {
+							$theMsg1 = '<div class="alert alert-danger">Failed To Delete The Avatar or Url Not Good</div>';
+							redirectHome($theMsg1, 'back');
+						}
+					
+					} else { // if file doesnot exits
+						echo '<div class="alert alert-danger">No Avatar For This User</div>';
+						// begin to delete the user from Database
+						$stmt = $con->prepare("DELETE FROM users WHERE UserID = ?");
+						$stmt->execute([$userid]);
+						// show succes message for User Deleted from Database
+						$theMsg = '<div class="alert alert-success">' . $stmt1->rowCount() . ' User Is Deleted from Database</div>';
+						redirectHome($theMsg, 'back');
+					}
+
+					
+
+
+				} else { // If there is no Avatar For This User Delete his info from Database
+
+					$stmt = $con->prepare("DELETE FROM users WHERE UserID = ?");
+					$stmt->execute([$userid]);
+
+					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Deleted</div>';
+					redirectHome($theMsg, 'back');
+				}
+
+			} else {
+
+				$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
+				redirectHome($theMsg);
+
+			}
+
+		  echo '</div>';
+
+		}
 
       include $tpl . "footer.php";
 

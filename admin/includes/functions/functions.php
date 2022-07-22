@@ -96,16 +96,33 @@
 	function checkItem($select, $from, $value) {
 
 		global $con;
-
 		$statement = $con->prepare("SELECT $select FROM $from WHERE $select = ?");
-
 		$statement->execute(array($value));
+		$count = $statement->rowCount();
+		return $count;
 
+	}
+
+	/* 
+	** Check avatar Function v1.0
+	** Function To Check avatar In Database [ Function Accept Parameters ]
+	** $select = The avatar To Select [ Example: user, item, category ]
+	** $from = The Table To Select From [ Example: users, items, categories ]
+	** $Value = The Value Of avatar [ Example: Osama, Box, Electronics ]
+	*/
+
+	function avatarCheck($select, $from, $value, $value2) {
+
+		global $con;
+
+		$statement = $con->prepare("SELECT $select FROM $from WHERE $value $value2");
+		$statement->execute();
 		$count = $statement->rowCount();
 
 		return $count;
 
 	}
+
 
 
 	/*
