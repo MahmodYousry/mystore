@@ -76,12 +76,12 @@
 										echo "<td>" . $item['catgory_name'] . "</td>";
 										echo "<td>" . $item['Username'] . "</td>";
 										echo "<td>
-												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
-												<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary'><i class='fa fa-edit'></i> Set Image</a>
-												<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger'><i class='fa fa-close'></i> Delete Img</a>
-												<a href='items.php?do=Delete&itemid=" . $item['Item_ID'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete all</a>";
+												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='Edit this item'><i class='fa fa-edit'></i> Edit</a>
+												<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>
+												<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item image From Database and From the Server'><i class='fa fa-close'></i> Delete Img</a>
+												<a href='items.php?do=Delete&itemid=" . $item['Item_ID'] . "' class='btn btn-danger confirm' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
 												if ($item['Approve'] == 0) {
-													echo "<a href='items.php?do=Approve&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate'><i class='fa fa-check'></i> Approve</a>";
+													echo "<a href='items.php?do=Approve&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
 												}
 										echo "</td>";
 									echo "</tr>";
@@ -101,7 +101,7 @@
 									$pageName = "items.php";
 									$prevPage = $page - '1';
 									$itszero = '';
-									if ($prevPage < 1) { $prevPage = 1; } else { $prevPage = $page - '1'; $itszero = 'disabled';}
+									if ($prevPage == 0) { $prevPage = 1; } else { $prevPage = $page - '1'; $itszero = 'disabled';}
 									if ($page == 1) { $itszero = 'disabled';} else {$itszero = '';}
 
 									echo '<li class="page-item ' .$itszero. '"><a class="page-link" href="'.$pageName.'?page=' . $prevPage . '">Previous</a></li>';
@@ -116,7 +116,13 @@
 										$nextPage = $page + '1';
 										
 									};
-									echo '<li class="page-item"><a class="page-link" href="'.$pageName.'?page=' . $nextPage . '">Next</a></li>';
+									// NEXT button function
+									if ($page == $total_pages) { // if we are ate the last page - disable the next button
+										echo '<li class="page-item disabled"><a class="page-link" href="#">Next</a></li>';
+									} else { // if not last page make next button work
+										echo '<li class="page-item"><a class="page-link" href="'.$pageName.'?page=' . $nextPage . '">Next</a></li>';
+									}
+									
 								echo '</ul>';
 							echo '</nav>';
 						echo '</div>';
