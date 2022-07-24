@@ -6,8 +6,15 @@
 
             //Homepage
 
-            'MESSAGE' => 'Welcome in arabic',
-            'ADMIN' => 'arabic admin'
+            'HOME_ADMIN'    => 'الرئيسيه',
+            'CATEGORIES'    => 'الفئات',
+            'ITEMS'         => 'المنتجات',
+            'MEMBERS'       => 'الاعضاء',
+            'COMMENTS'      => 'الكومنتات',
+            'STATISTICS'    => 'Statistics',
+            'LOGS'          => 'Logs',
+            'STATUS'        => 'الحاله',
+            ''  => '',
 
         );
 

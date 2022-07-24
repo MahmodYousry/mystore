@@ -425,6 +425,10 @@ h1 {
   font-size: 18px;
 }
 
+.add-new-item textarea {
+  min-height: 100px;
+}
+
 .message {
   background: #fff;
   padding: 10px;

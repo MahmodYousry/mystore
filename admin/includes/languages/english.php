@@ -13,7 +13,7 @@
             'COMMENTS'      => 'Comments',
             'STATISTICS'    => 'Statistics',
             'LOGS'          => 'Logs',
-            ''  => '',
+            'STATUS'        => 'Status',
             ''  => '',
 
         );

@@ -81,7 +81,9 @@
     </head>
     <body>
     <div class="upper-bar">
+
         <div class="container">
+        <a class="text-capitalize" href="./admin"><span>admin</span></a>
           <?php
             if (isset($_SESSION['user'])) { ?>
 
@@ -105,9 +107,8 @@
 
             } else {
           ?>
-          <a href="login.php">
-            <span class="pull-right">Login/Signup</span>
-          </a>
+          <a href="login.php"> <span class="pull-right">Login/Signup</span></a>
+          
           <?php } ?>
         </div>
     </div>
