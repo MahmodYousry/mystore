@@ -18,13 +18,11 @@
 	    if ($do == 'Manage') {
 
       	// Select All Users Except Admin
-      	$stmt = $con->prepare("SELECT * FROM status ORDER BY stat_id DESC");
+      	$stmt = $con->prepare("SELECT * FROM `status` ORDER BY stat_id DESC");
       	$stmt->execute();
       	$status = $stmt->fetchAll();
 
-      	if (! empty($status)) {
-
-      		?>
+      	if (! empty($status)) { ?>
 
 			<h1 class="text-center">Manage status</h1>
 			<div class="container">
@@ -48,8 +46,9 @@
 									echo "<td>" . $stat['stat_id'] . "</td>";
 									echo "<td>" . $stat['stat_name'] . "</td>";
 									echo "<td>
-											<a href='status.php?do=Edit&stat_id=" . $stat['stat_id'] . "' class='btn btn-success'><i class='fa fa-edit'></i> Edit</a>
-											<a href='status.php?do=Delete&stat_id=" . $stat['stat_id'] . "' class='btn btn-danger confirm'><i class='fa fa-close'></i> Delete</a>";
+											<a href='status.php?do=Edit&stat_id=" . $stat['stat_id'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='edit status name'><i class='fa fa-edit'></i> Edit</a>
+											
+											<a href='status.php?do=Delete&stat_id=" . $stat['stat_id'] . "' class='btn btn-danger confirm' data-toggle='tooltip' data-placement='left' title='Deletes the status from database'><i class='fa fa-close'></i> Delete</a>";
 									echo "</td>";
 								echo "</tr>";
 							}

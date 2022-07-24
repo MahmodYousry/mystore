@@ -400,7 +400,8 @@
 			echo '<h1 class="text-center">Delete Item Image</h1>';
       		echo '<div class="container">';
 
-      		$itemofid = $_GET['itemid'];
+      		
+			$itemofid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
 
 	  		$getAny = $con->prepare("SELECT * FROM items WHERE Item_ID = ?");
 			$getAny->execute(array($itemofid));

@@ -110,4 +110,8 @@ $(function () {
             
         });
 
+        // necessary for bootstrap functions
+        $('[data-toggle="tooltip"]').tooltip();
+        $('.alert').alert();
+
 });

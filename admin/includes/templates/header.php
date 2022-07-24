@@ -25,7 +25,7 @@
                         postid       = <?php if(isset($_GET['itemid'])) {echo $_GET['itemid'];} ?>
 
                     // send text only to php file which is the postid and it's not defined error 
-                    $.ajax({url: "phpAjax/deleteFiles.php", type: "POST", async: false,
+                    $.ajax({url: "phpajax/deleteFiles.php", type: "POST", async: false,
                         data: {
                             "delitemImageAddress": delitemImageAddress,
                             "subdeliImage": subdeliImage,
