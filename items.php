@@ -65,7 +65,6 @@
 									echo "<a href='tags.php?name={$lowertag}'>" . $tag . '</a>';
 								}
 							}
-
 						?>
 					</li>
 				</ul>

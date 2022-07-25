@@ -13,6 +13,10 @@ body {
   color:#D20707;
 }
 
+.hideThis {
+  display: none !important;
+}
+
 .nice-message {
   padding: 10px;
   background: #FFF;

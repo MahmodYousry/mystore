@@ -82,12 +82,20 @@
 												} else { // if there is image show delete img button
 													echo "<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item image From Database and From the Server'><i class='fa fa-close'></i> Delete Img</a>";
 												}
-												echo "<a href='items.php?do=Delete&itemid=" . $item['Item_ID'] . "' class='btn btn-danger confirm' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
-												if ($item['Approve'] == 0) { // if no approve done show the button
-													echo "<a href='items.php?do=Approve&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
-												} else {
-													echo "<a href='items.php?do=disapprove&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate text-capitalize' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
-												}
+												echo "<a id='" . $item['Item_ID'] . "' onclick='deleteAll(this.id);' href='#' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
+												?>
+												<div id="options_con"> <?php
+													if ($item['Approve'] == 0) { // if disapproved show approve button 
+														echo "<a data-id='approve' 		id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' href='#' class='btn btn-info' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
+														echo "<a data-id='disapprove' 	id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' href='#' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
+													} else { // if approved show disapprove button
+														echo "<a id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' href='#' class='btn btn-info text-capitalize' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
+														echo "<a id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' href='#' class='btn btn-info hideThis' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
+													}
+												?>
+												</div>
+												
+												<?php
 										echo "</td>";
 									echo "</tr>";
 								}
@@ -713,136 +721,7 @@
 
       		echo '</div>';
 
-	    } elseif ($do == 'Delete') {
-
-			echo '<h1 class="text-center">Delete Item</h1>';
-      		echo '<div class="container">';
-
-	      		// Check If Get Request itemid Is Numberic & Get The Integer Value of it.
-				$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
-
-				// Select All Data Depend on This ID
-				$check = checkItem('Item_ID', 'items', $itemid);
-
-				// If There's Such ID Show The Form
-				if ($check > 0) {
-					// Check if there is img
-					$checkItemImg = avatarCheck('Image', 'items', 'Item_ID = ', $itemid);
-
-					if ($checkItemImg > 0) { // if There is img For this item
-						$stmt1 = $con->prepare("SELECT Image FROM items WHERE Item_ID = ?");
-						$stmt1->execute([$itemid]);
-						$avatr = $stmt1->fetch();
-	
-						echo '<div class="alert alert-info">Found One Image For This Item</div>';
-	
-						$avUrl = "../products/" . $avatr['Image'];
-	
-						if (file_exists($avUrl)) { // if file exits in the server
-	
-							echo '<div class="alert alert-info text-capitalize">There is Image For This Item</div>';
-	
-							if (unlink($avUrl)) { // Delete the img File From the Server using the url given
-								// show succes message for Avatar Deleted
-								echo '<div class="alert alert-success">' . $stmt1->rowCount() . ' Image Deleted</div>';
-								// begin to delete the item from Database
-								$stmt = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
-								$stmt->execute([$itemid]);
-								// show succes message for User Deleted from Database
-								$theMsg = '<div class="alert alert-success text-capitalize">' . $stmt1->rowCount() . ' item Is Deleted from Database</div>';
-								redirectHome($theMsg, 'back');
-							} else {
-								$theMsg1 = '<div class="alert alert-danger">Failed To Delete The Image or Url Not Good</div>';
-								redirectHome($theMsg1, 'back');
-							}
-						
-						} else { // if file does not exits on the server
-							echo '<div class="alert alert-danger text-capitalize">No Image file For This item Found on the server</div>';
-							// begin to delete the user from Database
-							$stmt = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
-							$stmt->execute([$itemid]);
-							// show succes message for User Deleted from Database
-							$theMsg = '<div class="alert alert-success text-capitalize">' . $stmt1->rowCount() . ' item Is Deleted from Database</div>';
-							redirectHome($theMsg, 'back');
-						}
-
-					} else { // If there is no image For This item Delete the item from Database
-
-						$stmt = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
-						$stmt->execute([$itemid]);
-	
-						$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Deleted</div>';
-						redirectHome($theMsg, 'back');
-					}
-
-				} else {
-
-					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
-					redirectHome($theMsg);
-
-				}
-
-			echo '</div>';
-
-		} elseif ($do == 'Approve') {
-
-      		echo '<h1 class="text-center">Approve Item</h1>';
-      		echo '<div class="container">';
-
-	      		// Check If Get Request itemid Is Numberic & Get The Integer Value of it.
-				$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
-
-				// Select All Data Depend on This ID
-				$check = checkItem('Item_ID', 'items', $itemid);
-
-				// If There's Such ID Show The Form
-				if($check > 0) {
-
-					$stmt = $con->prepare("UPDATE items SET Approve = 1 WHERE Item_ID = ?");
-					$stmt->execute(array($itemid));
-
-					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Updated</div>';
-					redirectHome($theMsg, 'back');
-
-				} else {
-
-					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
-					redirectHome($theMsg);
-
-				}
-
-			echo '</div>';
-
-		} elseif ($do == 'disapprove') {
-
-			echo '<h1 class="text-center">Disapprove Item</h1>';
-      		echo '<div class="container">';
-
-	      		// Check If Get Request itemid Is Numberic & Get The Integer Value of it.
-				$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
-
-				// Select All Data Depend on This ID
-				$check = checkItem('Item_ID', 'items', $itemid);
-
-				// If There's Such ID Show The Form
-				if($check > 0) {
-
-					$stmt = $con->prepare("UPDATE items SET Approve = 0 WHERE Item_ID = ?");
-					$stmt->execute(array($itemid));
-
-					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Updated</div>';
-					redirectHome($theMsg, 'back');
-
-				} else {
-
-					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
-					redirectHome($theMsg);
-
-				}
-
-			echo '</div>';
-
-		}
+	    } 
 
 		include $tpl . 'footer.php';
 
