@@ -76,12 +76,17 @@
 										echo "<td>" . $item['catgory_name'] . "</td>";
 										echo "<td>" . $item['Username'] . "</td>";
 										echo "<td>
-												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='Edit this item'><i class='fa fa-edit'></i> Edit</a>
-												<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>
-												<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item image From Database and From the Server'><i class='fa fa-close'></i> Delete Img</a>
-												<a href='items.php?do=Delete&itemid=" . $item['Item_ID'] . "' class='btn btn-danger confirm' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
-												if ($item['Approve'] == 0) {
+												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='Edit this item'><i class='fa fa-edit'></i> Edit</a>";
+												if (!file_exists('../products/'.$item['Image'])) { // if there is no image show set img button
+													echo "<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>";
+												} else { // if there is image show delete img button
+													echo "<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item image From Database and From the Server'><i class='fa fa-close'></i> Delete Img</a>";
+												}
+												echo "<a href='items.php?do=Delete&itemid=" . $item['Item_ID'] . "' class='btn btn-danger confirm' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
+												if ($item['Approve'] == 0) { // if no approve done show the button
 													echo "<a href='items.php?do=Approve&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
+												} else {
+													echo "<a href='items.php?do=disapprove&itemid=" . $item['Item_ID'] . "' class='btn btn-info activate text-capitalize' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
 												}
 										echo "</td>";
 									echo "</tr>";
@@ -794,6 +799,35 @@
 				if($check > 0) {
 
 					$stmt = $con->prepare("UPDATE items SET Approve = 1 WHERE Item_ID = ?");
+					$stmt->execute(array($itemid));
+
+					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Updated</div>';
+					redirectHome($theMsg, 'back');
+
+				} else {
+
+					$theMsg = '<div class="alert alert-danger">This ID Is Not Exist</div>';
+					redirectHome($theMsg);
+
+				}
+
+			echo '</div>';
+
+		} elseif ($do == 'disapprove') {
+
+			echo '<h1 class="text-center">Disapprove Item</h1>';
+      		echo '<div class="container">';
+
+	      		// Check If Get Request itemid Is Numberic & Get The Integer Value of it.
+				$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
+
+				// Select All Data Depend on This ID
+				$check = checkItem('Item_ID', 'items', $itemid);
+
+				// If There's Such ID Show The Form
+				if($check > 0) {
+
+					$stmt = $con->prepare("UPDATE items SET Approve = 0 WHERE Item_ID = ?");
 					$stmt->execute(array($itemid));
 
 					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Updated</div>';
