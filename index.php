@@ -11,7 +11,13 @@
 <div class="container">
 	<div class="row">
 		<?php 
-			$allItems = getAllFrom('*', 'items', 'where Approve = 1', '', 'Item_ID', 'DESC');
+			//$allItems = getAllFrom('*', 'items', 'where Approve = 1', '', 'Item_ID', 'DESC');
+			$stmt = $con->prepare("SELECT * FROM items
+									JOIN status ON status.stat_id = items.Status
+									WHERE Approve = 1 ORDER BY Item_ID DESC");
+			$stmt->execute();
+			$allItems = $stmt->fetchAll();
+
 			foreach ($allItems as $item) {
 				echo '<div class="col-sm-6 col-md-3">';
 					echo '<div class="thumbnail item-box">';
@@ -20,6 +26,7 @@
 						echo '<div class="caption">';
 							echo '<h3 class="text-center"><a href="items.php?itemid=' . $item['Item_ID'] . '">' . $item['Name'] . '</a></h3>';
 							echo '<p class="text-center">' . $item['Description'] . '</p>';
+							echo '<p class="text-center">' . $item['stat_name'] . '</p>';
 							echo '<div class="date">' . $item['Add_Date'] . '</div>';
 						echo '</div>';
 					echo '</div>';

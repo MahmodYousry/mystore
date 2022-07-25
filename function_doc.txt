@@ -1,7 +1,0 @@
-========================
-== Functions Document ==
-========================
-
-getAllFrom($field, $table, $where = NULL, AND = NULL, $orderField, $Oredering);
-
-$where can be empty
