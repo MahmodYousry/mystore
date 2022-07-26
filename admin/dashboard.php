@@ -6,7 +6,7 @@
     
     if (isset($_SESSION['Username'])) {
 
-      $pageTitle ='Dashboard';
+      $pageTitle ='Admin | Dashboard';
 
       include 'init.php';
 

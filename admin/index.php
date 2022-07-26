@@ -2,7 +2,7 @@
     ob_start();
     session_start();
     $noNavbar = '';
-    $pageTitle = 'Login';
+    $pageTitle = 'Admin | Login';
 
     if (isset($_SESSION['Username'])) {
       header('Location: dashboard.php'); //Redirect To Dashboard Page

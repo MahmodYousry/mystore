@@ -9,7 +9,7 @@
 
 	ob_start(); // OutPut Buffering Start
 	session_start();
-	$pageTitle = 'Members';
+	$pageTitle = 'Admin | Members';
     
     if (isset($_SESSION['Username'])) {
 

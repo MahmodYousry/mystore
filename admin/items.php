@@ -8,7 +8,7 @@
 
 	ob_start(); // OutPut Buffering Start
 	session_start();
-	$pageTitle = 'Items';
+	$pageTitle = 'Admin | Items';
 
     if (isset($_SESSION['Username'])) {
       include 'init.php';
@@ -85,12 +85,13 @@
 												echo "<a id='" . $item['Item_ID'] . "' onclick='deleteAll(this.id);' href='#' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
 												?>
 												<div id="options_con"> <?php
-													if ($item['Approve'] == 0) { // if disapproved show approve button 
-														echo "<a data-id='approve' 		id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' href='#' class='btn btn-info' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
-														echo "<a data-id='disapprove' 	id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' href='#' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
+													if ($item['Approve'] == 0) { // if disapproved show approve button
+														echo "<button id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' class='btn btn-info' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</button>"; 
+														echo "<button id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</button>"; 
+														
 													} else { // if approved show disapprove button
-														echo "<a id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' href='#' class='btn btn-info text-capitalize' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</a>";
-														echo "<a id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' href='#' class='btn btn-info hideThis' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</a>";
+														echo "<button id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' class='btn btn-info' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</button>"; 
+														echo "<button id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</button>"; 
 													}
 												?>
 												</div>
@@ -157,6 +158,16 @@
 	  		<h1 class="text-center">Add New Item</h1>
 			<div class="container">
 				<form class="form-horizontal add-new-item" action="?do=Insert" method="POST" enctype="multipart/form-data">
+					<!-- Start upload pic Field -->
+					<div class="form-group form-group-lg">
+						<label class="col-sm-2 control-label" for="filepic">img</label>
+						<div class="col-sm-10 col-md-8">
+							<input multiple type="file" class="form-control"
+								id="gallery-photo-add" name="productpic" oninput="pic.style.display = 'block';">
+							<div class="gallery"></div>
+						</div>
+					</div>
+					<!-- END upload pic Field -->
 					<!-- Start Name Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Name</label>
@@ -166,7 +177,7 @@
 								name="name" 
 								class="form-control" 
 								required="required" 
-								placeholder="Name of The Item" />
+								placeholder="Item Name" />
 						</div>
 					</div>
 					<!-- END Name Field -->
@@ -174,7 +185,7 @@
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Description</label>
 						<div class="col-sm-10 col-md-8">
-							<textarea name="description" class="form-control" required="required" placeholder="Description of The Item"></textarea>
+							<textarea name="description" class="form-control" required="required" placeholder="Item Description"></textarea>
 						</div>
 					</div>
 					<!-- END Description Field -->
@@ -187,7 +198,7 @@
 								name="price" 
 								class="form-control" 
 								required="required" 
-								placeholder="Price of The Item" />
+								placeholder="Item Price" />
 						</div>
 					</div>
 					<!-- END Price Field -->
@@ -260,15 +271,6 @@
 						</div>
 					</div>
 					<!-- END Tags Field -->
-					<!-- Start upload pic Field -->
-					<div class="form-group form-group-lg">
-						<label class="col-sm-2 control-label" for="filepic">img</label>
-						<div class="col-sm-10 col-md-8">
-							<input type="file" class="form-control" id="filepic" name="productpic">
-						</div>
-						
-					</div>
-					<!-- END upload pic Field -->
 					<!-- Start submit Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">

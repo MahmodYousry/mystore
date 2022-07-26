@@ -9,7 +9,7 @@
 
 	ob_start(); // OutPut Buffering Start
 	session_start();
-	$pageTitle = 'Status';
+	$pageTitle = 'Admin | Status';
 
     if (isset($_SESSION['Username'])) {
       include 'init.php';

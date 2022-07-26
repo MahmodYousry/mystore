@@ -8,7 +8,7 @@
 
 	ob_start(); // OutPut Buffering Start
 	session_start();
-	$pageTitle = 'Categories';
+	$pageTitle = 'Admin | Categories';
     if (isset($_SESSION['Username'])) {
 
       include 'init.php';

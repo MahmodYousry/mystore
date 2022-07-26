@@ -11,7 +11,7 @@
 
 	session_start();
 
-	$pageTitle = 'Comments';
+	$pageTitle = 'Admin | Comments';
     
     if (isset($_SESSION['Username'])) {
 

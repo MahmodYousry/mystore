@@ -443,9 +443,21 @@ h1 {
   font-size: 18px;
 }
 
+.add-new-item .gallery {
+  width: 100%;
+}
+
+.add-new-item .gallery img {
+  height: 200px;
+  margin: 10px 5px;
+  float: left;
+}
+
 .add-new-item textarea {
   min-height: 100px;
 }
+
+
 
 .message {
   background: #fff;
