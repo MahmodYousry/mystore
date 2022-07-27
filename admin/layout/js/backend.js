@@ -117,14 +117,13 @@ $(function () {
 
 
        
-        // Multiple images preview in browser
+        // Multiple images preview in items.php add page
         var imagesPreview = function(input, placeToInsertImagePreview) {
     
             if (input.files) {
-                var filesAmount = input.files.length,
-                    i;
+                var filesAmount = input.files.length;
                 
-                for (i = 0; i < filesAmount; i++) {
+                for (var i = 0; i < filesAmount; i++) {
                     var reader = new FileReader();
     
                     reader.onload = function(event) {
@@ -140,6 +139,10 @@ $(function () {
         $('#gallery-photo-add').on('change', function() {
             imagesPreview(this, 'div.gallery');
         });
+
+        
+        
+
 
 });
 

@@ -40,7 +40,7 @@
 			$rowls = $result1->fetch();
 			$total_pages = ceil($rowls["how_many_tags"] / $results_per_page);
 
-			if ($rowCout > 0) { ?>
+			if (isset($rowCout[0])) {?>
 
 				<h1 class="text-center">Manage Items</h1>
 				<div class="container">
@@ -63,12 +63,32 @@
 								<td>Username</td>
 								<td>Control</td>
 							</tr>
-
+							
 							<?php
+
+								
+							
 								foreach ($rowCout as $item) {
+
+									// get the images in item_imgs table by item id
+									$stmtimg = $con->prepare("SELECT * FROM item_imgs WHERE item_ID  = ?");
+									$stmtimg->execute([$item['Item_ID']]);
+
+									$itemImgs = $stmtimg->fetchAll();
+									
+
 									echo "<tr>";
 										echo "<td>" . $item['Item_ID'] . "</td>";
-										echo "<td><img class='items-image' src='../products/" . $item['Image'] . "'/></td>";
+
+											echo '<td>';
+												echo '<div class="imgs_cont">';
+												foreach ($itemImgs as $itemImg) {
+													echo "<img src='../products/" .$itemImg["img_src"]. "'>";
+												}
+												echo '</div>';
+											echo '</td>';
+
+
 										echo "<td>" . $item['Name'] . "</td>";
 										echo "<td>" . $item['Description'] . "</td>";
 										echo "<td>" . $item['Price'] . "</td>";
@@ -77,11 +97,12 @@
 										echo "<td>" . $item['Username'] . "</td>";
 										echo "<td>
 												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='Edit this item'><i class='fa fa-edit'></i> Edit</a>";
-												if (!file_exists('../products/'.$item['Image'])) { // if there is no image show set img button
-													echo "<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>";
-												} else { // if there is image show delete img button
-													echo "<a href='items.php?do=removeimg&itemid=" . $item['Item_ID'] . "' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item image From Database and From the Server'><i class='fa fa-close'></i> Delete Img</a>";
-												}
+
+												
+												echo "<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>";
+												
+												echo "<button id='deleteImgs" . $item['Item_ID'] . "' onclick='deleteImgs(this.id)' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item images From Database and From the Server'><i class='fa fa-close'></i> Delete Images</button>"; 
+												
 												echo "<a id='" . $item['Item_ID'] . "' onclick='deleteAll(this.id);' href='#' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item And Its Image From Database and From the Server'><i class='fa fa-close'></i> Delete all</a>";
 												?>
 												<div id="options_con"> <?php
@@ -90,8 +111,8 @@
 														echo "<button id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</button>"; 
 														
 													} else { // if approved show disapprove button
-														echo "<button id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' class='btn btn-info' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</button>"; 
-														echo "<button id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' class='btn btn-info text-capitalize hideThis' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</button>"; 
+														echo "<button id='approve" . $item['Item_ID'] . "' onclick='approveItem(this.id)' class='btn btn-info hideThis' data-toggle='tooltip' data-placement='left' title='item will not be seen without this option make sure to approve your item'><i class='fa fa-check'></i> Approve</button>"; 
+														echo "<button id='disapprove" . $item['Item_ID'] . "' onclick='disapproveItem(this.id)' class='btn btn-info text-capitalize' data-toggle='tooltip' data-placement='left' title='make sure to approve your item to be seen'><i class='fa fa-close'></i> dispprove</button>"; 
 													}
 												?>
 												</div>
@@ -145,8 +166,15 @@
 			} else {
 
 				echo '<div class="container">';
-					echo '<div class="nice-message">There\'s No Items To Show</div>';
-					echo '<a href="items.php?do=Add" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> New Item</a>';
+					echo '<div class="nice-message">There\'s No Items To Show</div>'; 
+					?>
+						<div class="members-options">
+							<a class="btn btn-md btn-primary" href="items.php?do=Add"><i class="fa fa-plus"></i> New Item</a>
+							<a class="btn btn-primary btn-md" href="dashboard.php">back 
+								<i class="fa fa-chevron-right fa-xs"></i>
+							</a>
+						</div>
+					<?php 
 				echo '</div>';
 
 
@@ -157,14 +185,22 @@
 
 	  		<h1 class="text-center">Add New Item</h1>
 			<div class="container">
-				<form class="form-horizontal add-new-item" action="?do=Insert" method="POST" enctype="multipart/form-data">
+				<form id="add_new_item" class="form-horizontal add-new-item" method="POST" enctype="multipart/form-data">
 					<!-- Start upload pic Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label" for="filepic">img</label>
-						<div class="col-sm-10 col-md-8">
-							<input multiple type="file" class="form-control"
-								id="gallery-photo-add" name="productpic" oninput="pic.style.display = 'block';">
-							<div class="gallery"></div>
+						<div class="col-sm-10 col-md-8 upload_section">
+
+							<input type="file" class="form-control" id="gallery-photo-add" name="productpic" multiple>
+
+							<div id="progress_bar" class="progress add-item-progress">
+								<div id="progress_bar_process" class="progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+							</div>
+
+							<div id="uploaded_image" class="gallery"></div>
+							<div class="clearfix"></div>
+							<div id="upload_status"></div>
+
 						</div>
 					</div>
 					<!-- END upload pic Field -->
@@ -274,107 +310,32 @@
 					<!-- Start submit Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">
-							<input type="submit" value="Add Item" class="btn btn-primary btn-sm" />
+							<input id="item_sumbit_button" type="submit" value="Add Item" class="btn btn-primary btn-sm" />
 							<a class="btn btn-primary btn-sm" href="items.php">back 
 								<i class="fa fa-chevron-right fa-xs"></i>
 							</a>
+							
 						</div>
 					</div>
 					<!-- END submit Field -->
+					<!-- Start error Field -->
+					<div class="form-group form-group-lg">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="signup_messages"></div>
+						</div>
+					</div>
+					<!-- END error Field -->
 				</form>
 			</div>
 
 		<?php 
 
 
-	    } elseif ($do == 'Insert') {
+	    } elseif ($do == 'setimg') { 
+			
+			$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
 
-      		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-	      		echo '<h1 class="text-center">Insert Item</h1>';
-	      		echo '<div class="container">';
-
-      			// Get Variables From The Form
-
-				// Upload Variables
-				$avatarName =  $_FILES['productpic']['name'];
-				$avatarSize =  $_FILES['productpic']['size'];
-				$avatarTmp 	=  $_FILES['productpic']['tmp_name'];
-			   	$avatarType =  $_FILES['productpic']['type'] . '<br>';
-
-				// List Of Allowed File Types To Upload
-				$avatarAllowedExtension = array("jpeg", "jpg", "png", "gif");
-
-				// explose shortcut for php 8 need
-				$explodeThispl = explode('.', $avatarName);
-				$avatarExtension = strtolower(end($explodeThispl));
-
-      			$name 		= $_POST['name'];
-      			$desc 		= $_POST['description'];
-      			$price 		= $_POST['price'];
-      			$status 	= $_POST['status'];
-      			$member 	= $_POST['member'];
-      			$cat 		= $_POST['category'];
-      			$tags 		= $_POST['tags'];
-
-      			// Validate The Form
-      			$formErrors = array();
-
-      			if (empty($name)) { $formErrors[] = 'Name Can\'t be <strong>Empty</strong>'; }
-				if (empty($desc)) { $formErrors[] = 'Description Can\'t be <strong>Empty</strong>'; }
-      			if (empty($price)) { $formErrors[] = 'Price Can\'t be <strong>Empty</strong>'; }
-				if ($status == 0) { $formErrors[] = 'You Must Choose The <strong>Status</strong>'; }
-				if ($member == 0) { $formErrors[] = 'You Must Choose The <strong>Member</strong>'; }
-				if ($cat == 0) { $formErrors[] = 'You Must Choose The <strong>Category</strong>'; }
-
-				if (empty($avatarName)) { $formErrors[] = 'Avatar Is <strong>Required</strong>'; }
-				if ($avatarSize > 6194304) { $formErrors[] = 'Avatar Can\'t Be Larger Than <strong>6MB</strong>'; }
-
-      			// Loop Into Errors Array And Echo It
-      			foreach($formErrors as $error) {
-      				echo '<div class="alert alert-danger">' . $error . '</div>';
-      			}
-
-      			// Check If There's No Error Proceed The Update Operation
-      			if (empty($formErrors)) {
-
-					$avatar = rand(0, 10000) . '_' . $avatarName;
-      				move_uploaded_file($avatarTmp, "../products/" . $avatar);
-
-					// Insert Userinfo To Database
-					$stmt = $con->prepare("INSERT INTO 
-							items(Name, Description, Price, Status, Add_Date, Cat_ID, Member_ID, tags, Image)
-						VALUES(:zname, :zdesc, :zprice, :zstatus, now(), :zcat, :zmember, :ztags, :zImage)");
-
-					$stmt->execute(array(
-						'zname'		=> $name,
-						'zdesc'		=> $desc,
-						'zprice'	=> $price,
-						'zstatus'	=> $status,
-						'zcat'		=> $cat,
-						'zmember'	=> $member,
-						'ztags'		=> $tags,
-						'zImage'  	=> $avatar
-					));
-
-					// Echo Success Message
-					$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Inserted</div>';
-					redirectHome($theMsg, 'back');
-      			}
-
-      		} else {
-
-      			echo '<div class="container">';
-					$theMsg = '<div class="alert alert-danger">Sorry You Can\'t Browse This Page Directly</div>';
-					redirectHome($theMsg);
-      			echo '</div>';
-
-      		}
-
-      		echo '</div>';
-
-
-	    } elseif ($do == 'setimg') { ?>
+			?>
 
 	    	
 			<h1 class="text-center">upload Image for item</h1>
@@ -389,7 +350,7 @@
 					<!-- Start post-img Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-10 col-md-6">
-							<input type="hidden" name="itemid" class="form-control" value="<?php if (isset($_GET["itemid"])) { echo $_GET["itemid"];} ?>" autocomplete="off" />
+							<input type="hidden" name="itemid" class="form-control" value="<?php echo $itemid ?>" autocomplete="off" />
 						</div>
 					</div>
 					<!-- END post-img Field -->
@@ -398,7 +359,7 @@
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Image</label>
 						<div class="col-sm-10 col-md-6">
-							<input type="file" name="postImg" class="form-control newitemImg" autocomplete="off" />
+							<input type="file" class="form-control" id="setImages" name="images[]" multiple>
 						</div>
 					</div>
 					<!-- END post-img Field -->

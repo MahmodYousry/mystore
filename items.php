@@ -27,7 +27,18 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-5">
-				<img class="img-responsive img-thumbnail center-block" src="products/<?php echo $item['Image']; ?>" alt="" />
+				<?php
+					// get the images in item_imgs table by itemid
+					$stmtimg = $con->prepare("SELECT * FROM item_imgs WHERE item_ID  = ?");
+					$stmtimg->execute([$item['Item_ID']]);
+					$itemImgs = $stmtimg->fetchAll();
+
+					foreach ($itemImgs as $itemImg) {
+						echo '<img class="img-responsive img-thumbnail center-block prev-image" src="products/' . $itemImg["img_src"] . '" alt="" />';
+					}
+				
+				?>
+				
 			</div>
 			<div class="col-md-7 item-info">
 				<h2><?php echo $item['Name'] ?></h2>

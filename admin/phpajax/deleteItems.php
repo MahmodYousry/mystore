@@ -12,50 +12,58 @@
 			$check = checkItem('Item_ID', 'items', $itemid);
 
 			if($check > 0) { // If There's Such Item ID
+                
+                // get the url of item images files
+                $stmt1 = $con->prepare("SELECT * FROM item_imgs WHERE item_ID = ?");
+                $stmt1->execute([$itemid]);
+                $itemImages = $stmt1->fetchAll();
 
-                // Image check
-                $checkImage = avatarCheck('Image', 'items', 'Item_ID = ', $itemid);
+                if ($stmt1->rowCount() > 0) { // there is images in database
 
-                if ($checkImage > 0) { // if There is Image For this Item
+                    foreach ($itemImages as $itemImage) {
 
-					$stmt1 = $con->prepare("SELECT Image FROM items WHERE Item_ID = ?");
-					$stmt1->execute([$itemid]);
-					$itemImage = $stmt1->fetch();
-
-					$avUrl = "../../products/" . $itemImage['Image'];
-
-                    if (file_exists($avUrl)) { // if file exits
-                        echo 'there is Image found For This item ';
-                        // Delete Image File From the Server using the url given
-                        // if done delete it from database
-                        if (unlink($avUrl)) {
-                            $stmt2 = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
+                        $avUrl = "../../products/" . $itemImage['img_src'];
+    
+                        if (file_exists($avUrl)) { // if file exits
+    
+                            // delete the image as file
+                            unlink($avUrl);
+    
+                            // delete images as data
+                            $stmt2 = $con->prepare("DELETE FROM item_imgs WHERE item_ID = ?");
                             $stmt2->execute([$itemid]);
-                            // show succes message for Avatar Deleted
-                            echo 'There is ' . $stmt2->rowCount() . ' Image Deleted';
+    
+                            // delete item from items
+                            $stmt3 = $con->prepare("DELETE FROM items WHERE item_ID = ?");
+                            $stmt3->execute([$itemid]);
+    
                         } else {
-                            echo 'Failed To Delete The Avatar or The Url Not Good';
+    
+                            // delete images as data
+                            $stmt22 = $con->prepare("DELETE FROM item_imgs WHERE item_ID = ?");
+                            $stmt22->execute([$itemid]);
+    
+                            // delete item from items
+                            $stmt33 = $con->prepare("DELETE FROM items WHERE item_ID = ?");
+                            $stmt33->execute([$itemid]);
+    
                         }
-                        
-                    } else { // if file doesnot exits
-                        echo 'No Image Found For this Item as file';
-
-                        $stmt = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
-						$stmt->execute([$itemid]);
-	
-						$theMsg = '<div class="alert alert-success">' . $stmt->rowCount() . ' Record Deleted</div>';
-						redirectHome($theMsg, 'back');
+                       
                     }
 
-				} else { // If there is no Image For This Item Delete It from Database
-                    $stmt3 = $con->prepare("DELETE FROM items WHERE Item_ID = ?");
-                    $stmt3->execute([$itemid]);
+                } else { // if there is no images in database delete the item
+                    // delete images as data
+                    $stmt44 = $con->prepare("DELETE FROM item_imgs WHERE item_ID = ?");
+                    $stmt44->execute([$itemid]);
 
-                    echo $stmt3->rowCount() . ' Record Deleted';
-				}
+                    // delete item from items
+                    $stmt66 = $con->prepare("DELETE FROM items WHERE item_ID = ?");
+                    $stmt66->execute([$itemid]);
+                }
+
 
             } else {
-				echo 'This ID Is Not Exist';
+				echo 'This item ID Is Not Exist';
 			}
 
         } else { echo 'Sorry You Can\'t Browse This Page Directly'; }

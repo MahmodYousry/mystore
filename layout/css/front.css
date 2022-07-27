@@ -123,6 +123,11 @@ h1 {
   height:32px;
 }
 
+.thumbnail .caption{
+  min-height: 230px;
+  overflow: hidden;
+}
+
 /* END Header Edits */
 
 /* Start Login Page Edits */
@@ -312,6 +317,10 @@ h1 {
 /* ENd Profile page */
 
 /* Start Show Items Page */
+
+.prev-image {
+  margin-bottom: 20px;
+}
 
 .item-info h2 {
   padding: 10px;

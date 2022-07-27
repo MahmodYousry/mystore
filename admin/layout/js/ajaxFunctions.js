@@ -1,6 +1,6 @@
 
 
-// Start read
+// Start read -> not working yet need edits
 function showData() {
 
     var ourdata = {datais : 'getUserInfo'};
@@ -119,3 +119,132 @@ function disapproveItem(i) {
     });
 
 }
+
+// function To delete images from item
+function deleteImgs(i) {
+    // remove 'deleteImgs' from i first to get pure item id
+    var ideleteimages = i.replace('deleteImgs','');
+    // get itemid to delete its images
+    var deleteitemImages = {item_id : ideleteimages};
+    console.log(deleteitemImages.item_id);
+
+    // send the data with ajax
+    $.ajax({url: "phpajax/deleteItemImages.php", type: "POST", async: false,
+        data: deleteitemImages,
+        success: function(data) {
+            alert(data);
+            // $('#'+ i).siblings().removeClass('hideThis');
+            // $('#'+ i).addClass('hideThis');
+        },
+        error: function(data) {alert(data)}
+    });
+
+}
+
+// start functions upload items images
+    function _(element) {
+        return document.getElementById(element);
+    }
+
+    // when select images 
+    _('gallery-photo-add').onchange = function (event) {
+
+        var form_Data = new FormData();
+        var image_number = 1;
+        var error = '';
+
+        for (var count = 0; count < _('gallery-photo-add').files.length; count++) {
+
+            if (!['image/jpeg', 'image/png', 'image/jpg', 'image/gif'].includes(_('gallery-photo-add').files[count].type)) {
+
+                error += '<div class="alert alert-danger text-capitalize"><br>'+ image_number +'<br> Selected File must be .jpg or .png only.</div>';
+
+            } else {
+                form_Data.append('images[]', _('gallery-photo-add').files[count]);
+            }
+
+            image_number++;
+
+        }
+
+        if (error != '') {
+
+            _('uploaded_image').innerHTML = error;
+            _('gallery-photo-add').value = '';
+
+        } else {
+
+            _('progress_bar').style.display = 'block';
+
+            // send ajax request
+            var ajax_request = new XMLHttpRequest();
+            ajax_request.open("POST", "phpajax/upload_item_images.php");
+
+            ajax_request.upload.addEventListener('progress', function(event) {
+
+                var percent_completed = Math.round((event.loaded / event.total) * 100);
+
+                _('progress_bar_process').style.width = percent_completed + '%';
+                _('progress_bar_process').innerHTML = percent_completed + '%';
+
+            });
+
+            ajax_request.addEventListener('load', function(event) {
+
+                _('upload_status').innerHTML += '<div class="alert alert-success text-capitalize">files uploaded successfully</div>';
+                _('gallery-photo-add').value = '';
+
+            });
+
+            ajax_request.send(form_Data);
+        }
+
+    };
+
+// END functions upload items images
+
+    // add new item
+    $(".signup_messages").hide();
+    $("#add_new_item").submit(function(e) {
+        e.preventDefault();    
+        var formData = new FormData(this);
+        $.ajax({
+            url: "phpajax/upload_item_info.php",
+            type: 'POST',
+            data: formData,
+            beforeSend:function () {
+                $("#item_sumbit_button").val("sending item info ...");
+            },
+            success: function (data) {
+                console.log(data);
+
+                if (data == 'success') {
+                    window.setTimeout(function(){
+                        // Move to a new location or you can do something else
+                        window.location.href = "items.php";
+                    }, 3000);
+                } else {
+                    $(".signup_messages").html('failed to insert or update new info for this item maybe you didnt change data in fields');
+                }
+
+                $(".signup_messages").show();
+                var sign_info_message = '<p class="success_message">' + data + '</p>';
+                $(".signup_messages").html(sign_info_message);
+                $("#item_sumbit_button").val("Add Item");
+
+            },
+            error: function (data) {
+                console.log(data);
+                var sign_erorr_message = '<p class="error_message">' + data + '</p>';
+                $(".signup_messages").fadeIn();
+                $(".signup_messages").html(sign_erorr_message);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+
+    
+

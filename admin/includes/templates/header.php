@@ -47,8 +47,8 @@
                 $("#setImgForitem-form").submit(function(e) {
                     e.preventDefault();
 
-                    $("#progressBar").show();
-                    $(".stltx").show();
+                    $("#progress_bar").show();
+                    $("#uploaded_image").show();
 
                     var formData = new FormData(this);
                     var ajax = new XMLHttpRequest();
@@ -58,8 +58,10 @@
                     ajax.addEventListener("error", errorHandler, false);
                     ajax.addEventListener("abort", abortHandler, false);
 
-                    ajax.open("POST", "phpajax/addItemImg.php");
+                    ajax.open("POST", "phpajax/set_item_images.php");
                     ajax.send(formData);
+
+                    alert(ajax.responseText);
 
                     return  $(".newitemImg").val("");
                   
