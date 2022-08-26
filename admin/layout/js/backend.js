@@ -140,8 +140,6 @@ $(function () {
             imagesPreview(this, 'div.gallery');
         });
 
-        
-        
 
 
 });

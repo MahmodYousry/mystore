@@ -57,7 +57,6 @@ function deleteAvatar(i) {
             console.log(data);
         }
     });
-
     
 }
 
@@ -141,6 +140,87 @@ function deleteImgs(i) {
 
 }
 
+    // delete image from items.php in set image section
+    function deleteSingleRows(i) {
+
+        let row_id = i.replace('row_id','');
+        //let itemid = document.getElementById(i).parentElement.getAttribute('id').replace('itemid','');
+
+       
+    
+        // set the data we get in var
+        var mainData = { 
+            row_id : row_id
+        };
+       
+       
+        // send the data with ajax
+        $.ajax({url: "phpajax/deleteSingleRow.php", type: "POST", async: false,
+            data: mainData,
+            success: function(data) {
+                if (data == 'success') {
+                    console.log(data);
+                    // this will hide the td after click delete
+                    document.getElementById(i).style.display = 'none';
+                    document.getElementById(i).parentElement.innerHTML = '<div class="alert alert-info text-capitalize">deleted</div>';
+                } else if (data == 'failed') {
+                    alert('failed to delete data');
+                    console.log(data);
+                }
+    
+                console.log(data);
+                
+            },
+            error: function(data) {alert(data)}
+        });
+    
+    }
+
+
+
+    // add new item
+    $(".signup_messages").hide();
+    $("#add_new_item").submit(function(e) {
+        e.preventDefault();    
+        var formData = new FormData(this);
+        $.ajax({
+            url: "phpajax/upload_item_info.php",
+            type: 'POST',
+            data: formData,
+            beforeSend:function () {
+                $("#item_sumbit_button").val("sending item info ...");
+            },
+            success: function (data) {
+                console.log(data);
+
+                if (data == 'success') {
+                    window.setTimeout(function(){
+                        // Move to a new location or you can do something else
+                        window.location.href = "items.php";
+                    }, 3000);
+                } else {
+                    $(".signup_messages").html('failed to insert or update new info for this item maybe you didnt change data in fields');
+                }
+
+                $(".signup_messages").show();
+                var sign_info_message = '<p class="success_message">' + data + '</p>';
+                $(".signup_messages").html(sign_info_message);
+                $("#item_sumbit_button").val("Add Item");
+
+            },
+            error: function (data) {
+                console.log(data);
+                var sign_erorr_message = '<p class="error_message">' + data + '</p>';
+                $(".signup_messages").fadeIn();
+                $(".signup_messages").html(sign_erorr_message);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+
 // start functions upload items images
     function _(element) {
         return document.getElementById(element);
@@ -203,47 +283,8 @@ function deleteImgs(i) {
 
 // END functions upload items images
 
-    // add new item
-    $(".signup_messages").hide();
-    $("#add_new_item").submit(function(e) {
-        e.preventDefault();    
-        var formData = new FormData(this);
-        $.ajax({
-            url: "phpajax/upload_item_info.php",
-            type: 'POST',
-            data: formData,
-            beforeSend:function () {
-                $("#item_sumbit_button").val("sending item info ...");
-            },
-            success: function (data) {
-                console.log(data);
+    
 
-                if (data == 'success') {
-                    window.setTimeout(function(){
-                        // Move to a new location or you can do something else
-                        window.location.href = "items.php";
-                    }, 3000);
-                } else {
-                    $(".signup_messages").html('failed to insert or update new info for this item maybe you didnt change data in fields');
-                }
-
-                $(".signup_messages").show();
-                var sign_info_message = '<p class="success_message">' + data + '</p>';
-                $(".signup_messages").html(sign_info_message);
-                $("#item_sumbit_button").val("Add Item");
-
-            },
-            error: function (data) {
-                console.log(data);
-                var sign_erorr_message = '<p class="error_message">' + data + '</p>';
-                $(".signup_messages").fadeIn();
-                $(".signup_messages").html(sign_erorr_message);
-            },
-            cache: false,
-            contentType: false,
-            processData: false
-        });
-    });
 
 
     

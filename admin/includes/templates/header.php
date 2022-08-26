@@ -47,8 +47,9 @@
                 $("#setImgForitem-form").submit(function(e) {
                     e.preventDefault();
 
-                    $("#progress_bar").show();
-                    $("#uploaded_image").show();
+                    $("#progressBar").show();
+                    $("#loading_n_total").show();
+                    $("#stltx").show();
 
                     var formData = new FormData(this);
                     var ajax = new XMLHttpRequest();
@@ -61,7 +62,7 @@
                     ajax.open("POST", "phpajax/set_item_images.php");
                     ajax.send(formData);
 
-                    alert(ajax.responseText);
+                    console.log(ajax.responseText);
 
                     return  $(".newitemImg").val("");
                   

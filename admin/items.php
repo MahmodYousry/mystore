@@ -331,34 +331,41 @@
 		<?php 
 
 
-	    } elseif ($do == 'setimg') { 
-			
-			$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
+	    } elseif ($do == 'setimg') {
+				// get item id from GET method
+				$itemid = isset($_GET['itemid']) && is_numeric($_GET['itemid']) ? intval($_GET['itemid']) : 0;
+				// get all images bounded with this item id
+				$stmt2 = $con->prepare("SELECT * FROM item_imgs WHERE item_ID = ? ORDER BY row_id DESC");
+				$stmt2->execute([$itemid]);
+				$item_images = $stmt2->fetchAll();
 
 			?>
 
 	    	
-			<h1 class="text-center">upload Image for item</h1>
+			<h1 class="text-center text-capitalize">upload Image for item</h1>
 			<div class="container">
-				<!-- Start form-img Field -->
+
+				
+
+
+				<!-- Start form-img upload Field -->
 				<form id="setImgForitem-form" class="form-horizontal" enctype="multipart/form-data">
 
 					<progress id="progressBar" style="width: 100%;height: 50px;color: #f90;" value="0" max="100" ></progress>
-					<h3 class="stltx" id="stltx"></h3>
+					<div class="stltx alert alert-info text-capitalize" id="stltx"></div>
 					<p id="loading_n_total"></p>
 
 					<!-- Start post-img Field -->
 					<div class="form-group form-group-lg">
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-10">
 							<input type="hidden" name="itemid" class="form-control" value="<?php echo $itemid ?>" autocomplete="off" />
 						</div>
 					</div>
 					<!-- END post-img Field -->
-					
 					<!-- Start post-img Field -->
 					<div class="form-group form-group-lg">
 						<label class="col-sm-2 control-label">Image</label>
-						<div class="col-sm-10 col-md-6">
+						<div class="col-sm-10 col-md-10">
 							<input type="file" class="form-control" id="setImages" name="images[]" multiple>
 						</div>
 					</div>
@@ -366,12 +373,39 @@
 					<!-- Start submit Field -->
 					<div class="form-group form-group-lg">
 						<div class="col-sm-offset-2 col-sm-10">
-							<input type="submit" value="Upload" class="btn btn-primary btn-lg" />
+							<!-- <input type="submit" value="Upload" class="btn btn-primary btn-lg" /> -->
+							<button type="submit" class="btn btn-primary btn-md"><i class="fa fa-check fa-fw"></i> Upload</button>
+
+							<a class="btn btn-primary btn-md" href="items.php">back 
+								<i class="fa fa-chevron-right fa-xs"></i>
+							</a>
 						</div>
 					</div>
 					<!-- END submit Field -->
 				</form>
-				<!-- END form-img Field -->
+				<!-- END form-img upload Field -->
+
+				<?php if (!empty($item_images)) {?>
+					<!-- Start Images Show -->
+					<div class="item-img-container">
+						<?php
+							foreach ($item_images as $item_image) {
+								echo '<div class="relative" id="itemid'.$itemid.'">';
+									echo '<span onclick="deleteSingleRows(this.id);" id="row_id'.$item_image['row_id'].'">';
+										echo '<i class="fa fa-close"></i>';
+										echo ' Delete';
+									echo '</span>';
+									
+									echo '<img src="../products/'.$item_image['img_src'].'">';
+								echo '</div>';
+							}
+						?>
+					</div>
+					<!-- Start Images Show -->
+				<?php } else {
+						echo '<div class="alert alert-success text-capitalize"><i class="fa fa-info-circle fa-fw"></i> No Images for this Item</div>';
+					}
+				?>
 			</div>
       	
 

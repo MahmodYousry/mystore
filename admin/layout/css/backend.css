@@ -496,5 +496,39 @@ h1 {
   display: flex;
 }
 
+.item-img-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  border: 3px solid #666666;
+  padding: 5px;
+  margin: 60px 0;
+}
+
+.item-img-container .relative {
+  position: relative;
+}
+
+.item-img-container .relative span {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  z-index: 5;
+  cursor: pointer;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 5px 9px;
+}
+
+.item-img-container .relative span:hover {
+  background-color: #333;
+}
+
+.item-img-container .relative img {
+  width: auto;
+  height: 250px;
+}
+
 /* End items page */
 
