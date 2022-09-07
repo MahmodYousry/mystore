@@ -99,7 +99,7 @@
 												<a href='items.php?do=Edit&itemid=" . $item['Item_ID'] . "' class='btn btn-success' data-toggle='tooltip' data-placement='left' title='Edit this item'><i class='fa fa-edit'></i> Edit</a>";
 
 												
-												echo "<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Set Image</a>";
+												echo "<a href='items.php?do=setimg&itemid=" . $item['Item_ID'] . "' class='btn btn-primary' data-toggle='tooltip' data-placement='left' title='set image for this item'><i class='fa fa-edit'></i> Edit Images</a>";
 												
 												echo "<button id='deleteImgs" . $item['Item_ID'] . "' onclick='deleteImgs(this.id)' class='btn btn-danger' data-toggle='tooltip' data-placement='left' title='Delete This item images From Database and From the Server'><i class='fa fa-close'></i> Delete Images</button>"; 
 												
@@ -345,7 +345,7 @@
 			<h1 class="text-center text-capitalize">upload Image for item</h1>
 			<div class="container">
 
-				
+				<input type="hidden" id="itemid" value="<?php echo $itemid; ?>">
 
 
 				<!-- Start form-img upload Field -->
@@ -379,6 +379,7 @@
 							<a class="btn btn-primary btn-md" href="items.php">back 
 								<i class="fa fa-chevron-right fa-xs"></i>
 							</a>
+							<button type="button" class="btn btn-primary" id="refreshImages" onclick="refreshImagesArea();"><i class="fa fa-refresh fa-fw"></i> refresh</button>
 						</div>
 					</div>
 					<!-- END submit Field -->
@@ -387,13 +388,13 @@
 
 				<?php if (!empty($item_images)) {?>
 					<!-- Start Images Show -->
+					
 					<div class="item-img-container">
 						<?php
 							foreach ($item_images as $item_image) {
 								echo '<div class="relative" id="itemid'.$itemid.'">';
 									echo '<span onclick="deleteSingleRows(this.id);" id="row_id'.$item_image['row_id'].'">';
-										echo '<i class="fa fa-close"></i>';
-										echo ' Delete';
+										echo '<i class="fa fa-close"></i> Delete';
 									echo '</span>';
 									
 									echo '<img src="../products/'.$item_image['img_src'].'">';

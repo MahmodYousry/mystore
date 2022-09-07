@@ -137,8 +137,52 @@ function deleteImgs(i) {
         },
         error: function(data) {alert(data)}
     });
-
 }
+
+
+    // refresh images area
+    function refreshImagesArea() {
+        // get item id 
+        let itemid = document.getElementById('itemid').value;
+        // set the data we get in var
+        var mainData = { 
+            itemid : itemid
+        };
+
+        var table = '';
+        // send it to php file there will get all images
+        $.ajax({url: "phpajax/getItemImages.php", type: "POST", async: false,
+            data: mainData,
+            success: function(data) {
+                if (data) {
+                    var myJSON = JSON.parse(data);
+
+                    for (let i = 0; i < myJSON.length; i++) {
+                        table += `
+                                <div class="relative" id="itemid${myJSON[i]['item_ID']}">
+                                    <span onclick="deleteSingleRows(this.id);" id="row_id${myJSON[i]['row_id']}">
+                                        <i class="fa fa-close"></i> Delete
+                                    </span>
+                                    <img src="../products/${myJSON[i][1]}">
+                                </div>
+                                
+                            `;   
+                    }
+
+                    //document.getElementsByClassName('item-img-container')[0].innerHTML = '';
+                    document.getElementsByClassName('item-img-container')[0].innerHTML = table;
+
+                } else if (data == 'noImages') {
+                    alert('No Images found for this item');
+                    console.log(data);
+                }
+                
+            },
+            error: function(data) {alert(data)}
+        });       
+
+        // put the data[images] to the imgaes parent div
+    }
 
     // delete image from items.php in set image section
     function deleteSingleRows(i) {
@@ -146,8 +190,6 @@ function deleteImgs(i) {
         let row_id = i.replace('row_id','');
         //let itemid = document.getElementById(i).parentElement.getAttribute('id').replace('itemid','');
 
-       
-    
         // set the data we get in var
         var mainData = { 
             row_id : row_id
@@ -159,7 +201,7 @@ function deleteImgs(i) {
             data: mainData,
             success: function(data) {
                 if (data == 'success') {
-                    console.log(data);
+                    console.log('delete ' + data);
                     // this will hide the td after click delete
                     document.getElementById(i).style.display = 'none';
                     document.getElementById(i).parentElement.innerHTML = '<div class="alert alert-info text-capitalize">deleted</div>';
@@ -167,12 +209,10 @@ function deleteImgs(i) {
                     alert('failed to delete data');
                     console.log(data);
                 }
-    
-                console.log(data);
                 
             },
             error: function(data) {alert(data)}
-        });
+        });       
     
     }
 

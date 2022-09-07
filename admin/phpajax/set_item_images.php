@@ -26,9 +26,6 @@
 
             }
 
-           
-
-
         }
 
         echo '<i class="fa fa-info-circle fa-fw"></i> Images Are Uploaded Successfully';

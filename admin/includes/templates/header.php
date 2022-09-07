@@ -64,8 +64,8 @@
 
                     console.log(ajax.responseText);
 
-                    return  $(".newitemImg").val("");
-                  
+                    return document.getElementById('setImages').value = '';
+                    
                 });
 
                 var loading         = document.getElementById('loading_n_total'),
@@ -83,6 +83,8 @@
                 function completeHandler(event) {
                     statusing.innerHTML = event.target.responseText;
                     progressBaring.value = 0;
+                    document.getElementById('refreshImages').click();
+                    $("#progressBar").hide();
                 }
                   
                 function errorHandler(event) {
